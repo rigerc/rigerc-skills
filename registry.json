@@ -115,6 +115,13 @@
       "content_sha256": "030023ea1394075505ac243ce03af5190d446a84a72cd0efd4fde4ab6a14c167"
     },
     {
+      "id": "rigerc/rigerc-skills/skills/tui-screen-flow-spec",
+      "name": "tui-screen-flow-spec",
+      "description": "Design or document framework-agnostic terminal user interfaces (TUIs). Generate source-backed UI, state, event, command, data, and validation contracts from existing applications, or plan new TUI screens with full state-machine flows. Ask material open questions before generating, validate contracts, and create a standalone interactive HTML contract explorer. Store design artifacts under docs/plans/generated/tui at the repository root. Use for TUI design, audits, reverse-engineering, contract extraction, and handoffs.",
+      "path": "skills/tui-screen-flow-spec",
+      "content_sha256": "d7fb4a249046559d5fe65e9098a21d441ff3c510d6be2fef584589402a6f3d39"
+    },
+    {
       "id": "rigerc/rigerc-skills/skills/tui-vhs-audit",
       "name": "tui-vhs-audit",
       "description": "Audit terminal user interfaces (TUIs) by scripting realistic keyboard journeys with Charmbracelet VHS, taking named PNG screenshots at key states and viewport sizes, visually reviewing layout and accessibility, and delivering evidence-backed findings. Use for TUI visual QA, regressions, navigation audits, clipping/overflow checks, empty/error/help states, or terminal UI screenshot requests.",
