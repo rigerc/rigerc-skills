@@ -1,6 +1,6 @@
 # rigerc-skills
 
-A Nosey custom registry containing rigerc’s skills, including herdr-management. The skills are indexed for browsing; technology mappings and detection rules are currently empty.
+A Nosey custom registry containing rigerc’s skills, including herdr-management. Technology mappings and detection rules recommend skills when their associated tools or project files are detected. Herdr and T3 delegation remain available for explicit requests.
 
 This is a **development template for Nosey 0.6.0-dev.0**. Unmodified Nosey 0.5.0 cannot consume this contract. A compatible released consumer has not been pinned yet; publication CI fails closed until [consumer.lock.json](consumer.lock.json) contains the released version and npm integrity. Local authoring works independently of Nosey.
 

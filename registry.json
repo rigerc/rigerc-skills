@@ -143,8 +143,350 @@
       "content_sha256": "0b9c7a4d43cbc4a9fee06bd0856d4b2a75cee7e1f0632cab59994e322bb46d9e"
     }
   ],
-  "technologies": [],
-  "augmentations": [],
+  "technologies": [
+    {
+      "id": "agentsmesh",
+      "name": "AgentsMesh",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "path",
+          "path": "agentsmesh.yaml"
+        },
+        {
+          "type": "path",
+          "path": "agentsmesh.local.yaml"
+        }
+      ],
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/agentsmesh-authoring"
+      ]
+    },
+    {
+      "id": "agnix",
+      "name": "agnix",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "agnix"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "py",
+          "name": "agnix"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "crate",
+          "name": "agnix-cli"
+        },
+        {
+          "type": "path",
+          "path": ".agnix.toml"
+        }
+      ],
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/agnix"
+      ]
+    },
+    {
+      "id": "anti-slop",
+      "name": "anti-slop",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "content",
+          "path_glob": "**/.oxlintrc.json",
+          "regex": "anti-slop",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/.oxlintrc.jsonc",
+          "regex": "anti-slop",
+          "case_sensitive": true
+        }
+      ],
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/fix-anti-slop"
+      ]
+    },
+    {
+      "id": "gum",
+      "name": "Charmbracelet Gum",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "content",
+          "path_glob": "**/Justfile",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/justfile",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/.justfile",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/*.sh",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/*.bash",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/*.zsh",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/*.fish",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        }
+      ],
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/gum-cli"
+      ]
+    },
+    {
+      "id": "knap",
+      "name": "Knap",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "knap"
+        }
+      ],
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/knap-skill"
+      ]
+    },
+    {
+      "id": "mcp-serena",
+      "name": "Serena MCP",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "py",
+          "name": "serena-agent"
+        },
+        {
+          "type": "mcp_package",
+          "name": "serena-agent"
+        }
+      ],
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/serena-usage"
+      ]
+    },
+    {
+      "id": "mcp-ue4ss-bridge",
+      "name": "UE4SS Bridge MCP",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "py",
+          "name": "ue4ss-bridge"
+        },
+        {
+          "type": "mcp_package",
+          "name": "ue4ss-bridge"
+        }
+      ],
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/ue4ss-bridge"
+      ]
+    },
+    {
+      "id": "noctalia-plugins",
+      "name": "Noctalia native Luau plugins",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "content",
+          "path_glob": "**/plugin.toml",
+          "regex": "(?=[\\s\\S]*plugin_api\\s*=\\s*[0-9]+)(?=[\\s\\S]*entry\\s*=\\s*[\"\\x27][^\"\\x27\\r\\n]+\\.luau[\"\\x27])",
+          "case_sensitive": true
+        }
+      ],
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/noctalia-plugin-development"
+      ]
+    },
+    {
+      "id": "octokit-js",
+      "name": "Octokit.js",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "@octokit/core"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "@octokit/rest"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "octokit"
+        }
+      ],
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/octokit-js"
+      ]
+    },
+    {
+      "id": "pastel-cli",
+      "name": "Pastel CLI",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "crate",
+          "name": "pastel"
+        },
+        {
+          "type": "content",
+          "path_glob": "**/*.sh",
+          "regex": "(^|[;&|()\\s])pastel\\s+(format|lighten|darken|mix|gradient|paint|color|textcolor|saturate|desaturate|rotate|complement|distinct|colorblind)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/*.bash",
+          "regex": "(^|[;&|()\\s])pastel\\s+(format|lighten|darken|mix|gradient|paint|color|textcolor|saturate|desaturate|rotate|complement|distinct|colorblind)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/Justfile",
+          "regex": "(^|[;&|()\\s])pastel\\s+(format|lighten|darken|mix|gradient|paint|color|textcolor|saturate|desaturate|rotate|complement|distinct|colorblind)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/justfile",
+          "regex": "(^|[;&|()\\s])pastel\\s+(format|lighten|darken|mix|gradient|paint|color|textcolor|saturate|desaturate|rotate|complement|distinct|colorblind)\\b",
+          "case_sensitive": true
+        }
+      ],
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/pastel-cli"
+      ]
+    },
+    {
+      "id": "readme",
+      "name": "README documentation",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "path",
+          "path": "README.md"
+        }
+      ],
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/readme-crafter-skill"
+      ]
+    },
+    {
+      "id": "rezi",
+      "name": "Rezi",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "@rezi-ui/core"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "@rezi-ui/jsx"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "@rezi-ui/node"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "@rezi-ui/testkit"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "create-rezi"
+        }
+      ],
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/rezi"
+      ]
+    },
+    {
+      "id": "vhs",
+      "name": "Charmbracelet VHS",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "extension",
+          "suffix": ".tape"
+        }
+      ],
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/tui-vhs-audit",
+        "rigerc/rigerc-skills/skills/vhs-cli"
+      ]
+    }
+  ],
+  "augmentations": [
+    {
+      "technology_id": "ink",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/ink",
+        "rigerc/rigerc-skills/skills/ink-testing-library"
+      ],
+      "signals": []
+    },
+    {
+      "technology_id": "just",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/justfile-expert"
+      ],
+      "signals": []
+    },
+    {
+      "technology_id": "vitest",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/vitest-testing"
+      ],
+      "signals": []
+    }
+  ],
   "combinations": [],
   "frontend_essentials": [],
   "always_recommend": []

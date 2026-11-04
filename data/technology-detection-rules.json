@@ -1,1 +1,284 @@
-{"schema_version":1,"technologies":[],"augmentations":[]}
+{
+  "schema_version": 1,
+  "technologies": [
+    {
+      "id": "agentsmesh",
+      "name": "AgentsMesh",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "path",
+          "path": "agentsmesh.yaml"
+        },
+        {
+          "type": "path",
+          "path": "agentsmesh.local.yaml"
+        }
+      ]
+    },
+    {
+      "id": "agnix",
+      "name": "agnix",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "agnix"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "py",
+          "name": "agnix"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "crate",
+          "name": "agnix-cli"
+        },
+        {
+          "type": "path",
+          "path": ".agnix.toml"
+        }
+      ]
+    },
+    {
+      "id": "anti-slop",
+      "name": "anti-slop",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "content",
+          "path_glob": "**/.oxlintrc.json",
+          "regex": "anti-slop",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/.oxlintrc.jsonc",
+          "regex": "anti-slop",
+          "case_sensitive": true
+        }
+      ]
+    },
+    {
+      "id": "gum",
+      "name": "Charmbracelet Gum",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "content",
+          "path_glob": "**/Justfile",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/justfile",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/.justfile",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/*.sh",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/*.bash",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/*.zsh",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/*.fish",
+          "regex": "(^|[;&|()\\s])gum\\s+(choose|confirm|file|filter|format|input|join|pager|spin|style|table|write|log|version-check)\\b",
+          "case_sensitive": true
+        }
+      ]
+    },
+    {
+      "id": "knap",
+      "name": "Knap",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "knap"
+        }
+      ]
+    },
+    {
+      "id": "mcp-serena",
+      "name": "Serena MCP",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "py",
+          "name": "serena-agent"
+        },
+        {
+          "type": "mcp_package",
+          "name": "serena-agent"
+        }
+      ]
+    },
+    {
+      "id": "mcp-ue4ss-bridge",
+      "name": "UE4SS Bridge MCP",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "py",
+          "name": "ue4ss-bridge"
+        },
+        {
+          "type": "mcp_package",
+          "name": "ue4ss-bridge"
+        }
+      ]
+    },
+    {
+      "id": "noctalia-plugins",
+      "name": "Noctalia native Luau plugins",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "content",
+          "path_glob": "**/plugin.toml",
+          "regex": "(?=[\\s\\S]*plugin_api\\s*=\\s*[0-9]+)(?=[\\s\\S]*entry\\s*=\\s*[\"\\x27][^\"\\x27\\r\\n]+\\.luau[\"\\x27])",
+          "case_sensitive": true
+        }
+      ]
+    },
+    {
+      "id": "octokit-js",
+      "name": "Octokit.js",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "@octokit/core"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "@octokit/rest"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "octokit"
+        }
+      ]
+    },
+    {
+      "id": "pastel-cli",
+      "name": "Pastel CLI",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "crate",
+          "name": "pastel"
+        },
+        {
+          "type": "content",
+          "path_glob": "**/*.sh",
+          "regex": "(^|[;&|()\\s])pastel\\s+(format|lighten|darken|mix|gradient|paint|color|textcolor|saturate|desaturate|rotate|complement|distinct|colorblind)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/*.bash",
+          "regex": "(^|[;&|()\\s])pastel\\s+(format|lighten|darken|mix|gradient|paint|color|textcolor|saturate|desaturate|rotate|complement|distinct|colorblind)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/Justfile",
+          "regex": "(^|[;&|()\\s])pastel\\s+(format|lighten|darken|mix|gradient|paint|color|textcolor|saturate|desaturate|rotate|complement|distinct|colorblind)\\b",
+          "case_sensitive": true
+        },
+        {
+          "type": "content",
+          "path_glob": "**/justfile",
+          "regex": "(^|[;&|()\\s])pastel\\s+(format|lighten|darken|mix|gradient|paint|color|textcolor|saturate|desaturate|rotate|complement|distinct|colorblind)\\b",
+          "case_sensitive": true
+        }
+      ]
+    },
+    {
+      "id": "readme",
+      "name": "README documentation",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "path",
+          "path": "README.md"
+        }
+      ]
+    },
+    {
+      "id": "rezi",
+      "name": "Rezi",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "@rezi-ui/core"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "@rezi-ui/jsx"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "@rezi-ui/node"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "@rezi-ui/testkit"
+        },
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "create-rezi"
+        }
+      ]
+    },
+    {
+      "id": "vhs",
+      "name": "Charmbracelet VHS",
+      "category": "Developer tools",
+      "signals": [
+        {
+          "type": "extension",
+          "suffix": ".tape"
+        }
+      ]
+    }
+  ],
+  "augmentations": []
+}

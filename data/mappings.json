@@ -1,1 +1,108 @@
-{"schema_version":1,"technologies":[],"augmentations":[],"combinations":[],"frontend_essentials":[],"always_recommend":[]}
+{
+  "schema_version": 1,
+  "technologies": [
+    {
+      "technology_id": "agentsmesh",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/agentsmesh-authoring"
+      ]
+    },
+    {
+      "technology_id": "agnix",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/agnix"
+      ]
+    },
+    {
+      "technology_id": "anti-slop",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/fix-anti-slop"
+      ]
+    },
+    {
+      "technology_id": "gum",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/gum-cli"
+      ]
+    },
+    {
+      "technology_id": "knap",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/knap-skill"
+      ]
+    },
+    {
+      "technology_id": "mcp-serena",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/serena-usage"
+      ]
+    },
+    {
+      "technology_id": "mcp-ue4ss-bridge",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/ue4ss-bridge"
+      ]
+    },
+    {
+      "technology_id": "noctalia-plugins",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/noctalia-plugin-development"
+      ]
+    },
+    {
+      "technology_id": "octokit-js",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/octokit-js"
+      ]
+    },
+    {
+      "technology_id": "pastel-cli",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/pastel-cli"
+      ]
+    },
+    {
+      "technology_id": "readme",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/readme-crafter-skill"
+      ]
+    },
+    {
+      "technology_id": "rezi",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/rezi"
+      ]
+    },
+    {
+      "technology_id": "vhs",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/vhs-cli",
+        "rigerc/rigerc-skills/skills/tui-vhs-audit"
+      ]
+    }
+  ],
+  "augmentations": [
+    {
+      "technology_id": "ink",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/ink",
+        "rigerc/rigerc-skills/skills/ink-testing-library"
+      ]
+    },
+    {
+      "technology_id": "just",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/justfile-expert"
+      ]
+    },
+    {
+      "technology_id": "vitest",
+      "skill_ids": [
+        "rigerc/rigerc-skills/skills/vitest-testing"
+      ]
+    }
+  ],
+  "combinations": [],
+  "frontend_essentials": [],
+  "always_recommend": []
+}
