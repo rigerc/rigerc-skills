@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "registry_id": "rigerc/rigerc-skills",
+  "skills": [
+    {
+      "id": "rigerc/rigerc-skills/skills/agentsmesh-authoring",
+      "name": "agentsmesh-authoring",
+      "description": "Author, edit, migrate, troubleshoot, and validate AgentsMesh canonical configuration (.agentsmesh rules, hooks, commands, agents, skills, MCP servers, permissions, ignore, lessons, and agentsmesh.yaml) for multiple AI coding tools.",
+      "path": "skills/agentsmesh-authoring",
+      "content_sha256": "155adf271153d908eab62f695cfc7f57d4086057ea95483056303e5310f1b94b"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/agnix",
+      "name": "agnix",
+      "description": "Use when asked to lint, validate, troubleshoot, or improve AI coding-agent configuration files (SKILL.md, AGENTS.md, CLAUDE.md, hooks, MCP, or IDE agent rules), or to set up agnix checks in CI. Run the agnix CLI, explain its diagnostics, and apply explicitly requested safe fixes across Claude Code, Codex, Cursor, Copilot, Kiro, OpenCode, and related tools.",
+      "path": "skills/agnix",
+      "content_sha256": "9d565ee1b6ee54e3ef47f0beb39c333ab60230740de93e36759f9ba2aa56af52"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/fix-anti-slop",
+      "name": "fix-anti-slop",
+      "description": "Diagnose and fix anti-slop Oxlint warnings and errors in TypeScript/JavaScript repositories, including optional Effect rules and oxc/no-accumulating-spread. Use when lint reports anti-slop violations, after installing or updating anti-slop, or when asked to make anti-slop checks pass without suppressing rules or weakening types.",
+      "path": "skills/fix-anti-slop",
+      "content_sha256": "6cf72d0376c86bff21c665875ded2cc34dc85dfb79b51b4459e86a9f19293466"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/gum-cli",
+      "name": "gum-cli",
+      "description": "Use Charmbracelet Gum to build polished interactive shell scripts with prompts, selectors, filters, spinners, formatting, tables, pagers, logging, and styled terminal output. Use when writing, reviewing, or debugging shell workflows that invoke the `gum` CLI.",
+      "path": "skills/gum-cli",
+      "content_sha256": "0f4d782af4fc8b44cf2325f30224297c313f07885ea17e82a3399378a78ee6d4"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/herdr-management",
+      "name": "herdr-management",
+      "description": "Install, configure, operate, and troubleshoot Herdr, the terminal workspace manager for AI coding agents. Use when the user explicitly asks about Herdr setup, config.toml, keybindings, themes, notifications, sessions, panes, workspaces, integrations, saved SSH machines, CLI automation, or agent coordination. Do not activate for generic terminal, tmux, or delegation tasks that do not mention Herdr.",
+      "path": "skills/herdr-management",
+      "content_sha256": "fc2c66280738e37f0612a40988e2e8ddc64e175ed0375ed781a56f3c49a694f7"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/ink",
+      "name": "ink",
+      "description": "Use when building, debugging, testing, or reviewing an Ink (React terminal CLI) application. Covers Ink 8 APIs, Node and React compatibility, components, input/paste, focus, terminal dimensions, scrolling, lifecycle, accessibility, and testing.",
+      "path": "skills/ink",
+      "content_sha256": "f9d970a943de849c78463bc7ea090edb9c773ab014786ec51c048e376dcf8b05"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/ink-testing-library",
+      "name": "ink-testing-library",
+      "description": "Write, improve, and debug automated tests for React-based Ink terminal/CLI components using the ink-testing-library package. Use when testing rendered terminal output, interactive keyboard input, rerenders, asynchronous UI changes, stdout/stderr frames, or teardown in Ink apps. Do not use for browser React DOM tests or when only a one-shot renderToString assertion is needed.",
+      "path": "skills/ink-testing-library",
+      "content_sha256": "89d846179da93d8575c6a017911cde0de69820ec1bb62ad3817d616669d7508c"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/justfile-expert",
+      "name": "justfile-expert",
+      "description": "Just command runner expertise — Justfile syntax, recipes, parameters, modules, shebang recipes. Use when authoring justfiles, project commands, or task automation.",
+      "path": "skills/justfile-expert",
+      "content_sha256": "ee3cbb1832dad4d358049b725e74adbf489f60af0182ec4a7bb2ea6bd25881d8"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/knap-skill",
+      "name": "knap-skill",
+      "description": "Write, explain, validate, and render Knap templates for Markdown or text output. Use for Knap variables, filters, conditions, loops, local assignments, CLI rendering, or batch generation; do not apply to unrelated Jinja, Liquid, or Mustache templates.",
+      "path": "skills/knap-skill",
+      "content_sha256": "ccb55520f904048d19f8b1a6c69ea2df185961f65e9e611aa81750b6efcb7679"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/noctalia-plugin-development",
+      "name": "noctalia-plugin-development",
+      "description": "Develop, maintain, debug, test, and publish Noctalia v5+ native Wayland shell plugins using plugin.toml manifests and isolated Luau entry scripts. Use for plugin widgets, panels, services, launcher providers, control-center shortcuts, desktop widgets, layer surfaces, declarative ui.* trees, scripting APIs, cross-entry state, IPC, plugin API compatibility, or Noctalia plugin reviews. Distinguish native Luau plugins from older QML/Quickshell extensions.",
+      "path": "skills/noctalia-plugin-development",
+      "content_sha256": "681e16a59034061a917963d7a54fd252680c904e811209060dfa111202daaf7d"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/octokit-js",
+      "name": "octokit-js",
+      "description": "Help build, review, and debug JavaScript or TypeScript integrations with GitHub using Octokit.js. Use for GitHub REST and GraphQL requests, pagination, authentication, GitHub Apps, webhook verification, permissions, and safe issue or pull-request automation.",
+      "path": "skills/octokit-js",
+      "content_sha256": "2ee2cfe615145fe8bf3899782a50bd5e5cf2b0bc1036d06a167db699c4488a7b"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/pastel-cli",
+      "name": "pastel-cli",
+      "description": "Use the `pastel` command-line tool (sharkdp/pastel) to generate, convert, analyze and manipulate colors. Use this skill whenever the user wants to convert colors between formats (hex, rgb, hsl, hsv, Lab, LCh, OkLab, OkLCh, CMYK, ANSI), lighten/darken/saturate/rotate a color, mix colors or build gradients, generate palettes, shades or visually distinct colors, pick readable text colors, check WCAG contrast, simulate colorblindness, name or sort colors, or print colored terminal text, even if they never mention \"pastel\". Also use it when the user mentions pastel, pastel-cli or color pipelines in a shell, or when exact color math is needed instead of guessing hex values. For palette, theme, dark-mode or accessibility design questions, it also provides optional design guidelines backed by pastel commands.",
+      "path": "skills/pastel-cli",
+      "content_sha256": "00ba8968fe73d5a09de03bb10be6064b45176d110c24d22996f64b436befddad"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/readme-crafter-skill",
+      "name": "readme-crafter-skill",
+      "description": "Creates repository-specific README.md files that act as landing pages, onboarding guides, and trust signals. Use when the user asks to write, rewrite, improve, audit, localize, or restructure a README, or when a codebase needs a GitHub-facing project overview. Common triggers include \"write a README\", \"improve my README\", \"generate README.md\", \"rewrite this project overview\", and \"make this repo easier to understand\". Adapts to libraries, CLI tools, apps, research repos, browser extensions, internal tools, monorepos, and bilingual README workflows.\n",
+      "path": "skills/readme-crafter-skill",
+      "content_sha256": "ff8b1609889926c025f491654918e1d8e74c74d4c371efa8a7956555d8af21e5"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/rezi",
+      "name": "rezi",
+      "description": "Build, extend, and troubleshoot Rezi TypeScript terminal user interfaces (TUIs). Use for @rezi-ui/core, @rezi-ui/node, create-rezi, ui.* widget trees, screens, routing, keyboard/focus behavior, forms, tables, overlays, testing, native rendering, and Rezi framework contributions.",
+      "path": "skills/rezi",
+      "content_sha256": "873242cfece61c65566a6181798a537fd99af608d73aa30c4b5891ccce589078"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/serena-usage",
+      "name": "serena-usage",
+      "description": "Serena MCP for project memory and code navigation. Use when managing Serena memories, navigating symbols, performing intelligent refactoring, or maintaining context/continuity across AI agent sessions.",
+      "path": "skills/serena-usage",
+      "content_sha256": "1f732d1e6f4a6b3055f4840fd4c3ed793f8c85127da4d1d7930621cca1e43538"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/t3-delegate",
+      "name": "t3-delegate",
+      "description": "Delegate bounded implementation, research, review, design, or test assignments to T3 Code child tasks. Use for requested delegation or independent work where the active host permits it; preserve selected providers, models, and options, collect completion evidence, and integrate results.",
+      "path": "skills/t3-delegate",
+      "content_sha256": "030023ea1394075505ac243ce03af5190d446a84a72cd0efd4fde4ab6a14c167"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/tui-vhs-audit",
+      "name": "tui-vhs-audit",
+      "description": "Audit terminal user interfaces (TUIs) by scripting realistic keyboard journeys with Charmbracelet VHS, taking named PNG screenshots at key states and viewport sizes, visually reviewing layout and accessibility, and delivering evidence-backed findings. Use for TUI visual QA, regressions, navigation audits, clipping/overflow checks, empty/error/help states, or terminal UI screenshot requests.",
+      "path": "skills/tui-vhs-audit",
+      "content_sha256": "044798c7426eba3d41337009798fa33f0f8db22851897b386c3c04f99c4c11c6"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/ue4ss-bridge",
+      "name": "ue4ss-bridge",
+      "description": "Inspect and manipulate a live, running Unreal Engine game through the ue4ss-bridge MCP server (UE4SS plus the UEBridge Lua mod). Use this whenever the user wants to examine UObjects, properties, UFunctions or class hierarchies in a running game; read or change a value live; run Lua inside the game; snapshot/diff or watch/hook values while they play; find out what the camera is aimed at; trigger UE4SS dumps (usmap, jmap, uht, cxx); or whenever ue4ss-bridge tools (bridge_status, inspect_object, eval_lua, snapshot_object, watch_property, hook_function, poll_events, etc.) are available. Also trigger on mentions of UE4SS, UEBridge, Unreal game modding or reverse engineering, \"the player pawn/controller\", or finding offsets and property names in a live game, even if the user never names the tool.",
+      "path": "skills/ue4ss-bridge",
+      "content_sha256": "4c3426a9f09ee0d4f0cd031f5bf195fa4a87aa4785f39393b1a4c17cb4206cad"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/vhs-cli",
+      "name": "vhs-cli",
+      "description": "Create and verify reproducible terminal recordings using Charmbracelet VHS. Use for .tape authoring, CLI/TUI demos, GIF/MP4/WebM recording, terminal screenshots, and ASCII golden fixtures. Offers simple (lint without rendering) and expanded (render, inspect, review) workflows.",
+      "path": "skills/vhs-cli",
+      "content_sha256": "8bd4efe6a3c75ad1cd18ccb458251e4db3f75c48c216c2f5bdd6cc853ad299ba"
+    },
+    {
+      "id": "rigerc/rigerc-skills/skills/vitest-testing",
+      "name": "vitest-testing",
+      "description": "Write, configure, debug, migrate, and review JavaScript/TypeScript tests with Vitest and Vite. Use for Vitest unit tests, async assertions, mocks/spies, fake timers, DOM or Browser Mode tests, coverage, CI, workspaces, flaky tests, Jest migration, or contributions to vitest-dev/vitest.",
+      "path": "skills/vitest-testing",
+      "content_sha256": "0b9c7a4d43cbc4a9fee06bd0856d4b2a75cee7e1f0632cab59994e322bb46d9e"
+    }
+  ],
+  "technologies": [],
+  "augmentations": [],
+  "combinations": [],
+  "frontend_essentials": [],
+  "always_recommend": []
+}

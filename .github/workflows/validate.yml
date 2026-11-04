@@ -1,0 +1,45 @@
+name: Validate custom registry
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    if: github.event_name != 'push' || github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - name: Compile deterministic publication candidate
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          npm run build:manifest -- --revision "$SOURCE_SHA" --out "$RUNNER_TEMP/one"
+          npm run build:manifest -- --revision "$SOURCE_SHA" --out "$RUNNER_TEMP/two"
+          diff -r "$RUNNER_TEMP/one" "$RUNNER_TEMP/two"
+          mkdir -p dist
+          cp -R "$RUNNER_TEMP/one/." dist/
+          node scripts/publish.mjs --verify
+      - name: Test pinned packed consumer
+        run: npm run test:consumer
+      - name: Record exact validated source
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+          SOURCE_RUN: ${{ github.run_id }}
+        run: |
+          node --input-type=module -e 'import{writeFileSync,readFileSync}from"node:fs";writeFileSync("dist/source.json",JSON.stringify({repository:process.env.SOURCE_REPOSITORY,revision:process.env.SOURCE_SHA,run_id:process.env.SOURCE_RUN,contract:JSON.parse(readFileSync("contracts.lock.json")).content_sha256})+"\n")'
+          cat dist/source.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: custom-registry-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30

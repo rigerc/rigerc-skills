@@ -1,0 +1,94 @@
+name: Publish custom registry
+on:
+  workflow_run:
+    workflows: ['Validate custom registry']
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      validation_run:
+        description: Successful validation run ID for the current default-branch revision
+        required: true
+permissions:
+  contents: write
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: custom-registry-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      VALIDATION_RUN: ${{ inputs.validation_run || github.event.workflow_run.id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+      - name: Bind successful run to current default branch
+        id: validated
+        run: node scripts/validated-run.mjs
+      - name: Download only that run's artifact
+        env:
+          SOURCE_SHA: ${{ steps.validated.outputs.sha }}
+        run: gh run download "$VALIDATION_RUN" --repo "$GH_REPO" --name "custom-registry-$SOURCE_SHA" --dir candidate
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Verify candidate bytes and source identity
+        env:
+          SOURCE_SHA: ${{ steps.validated.outputs.sha }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+          SOURCE_RUN: ${{ env.VALIDATION_RUN }}
+        run: node scripts/verify-candidate.mjs
+      - name: Retain immutable history
+        run: |
+          if git ls-remote --exit-code --heads origin registry-artifacts > /dev/null; then
+            git fetch origin registry-artifacts
+            mkdir history
+            git archive FETCH_HEAD | tar -x -C history
+          else
+            mkdir history
+          fi
+      - name: Stage complete deployment and reject stale revisions
+        env:
+          SOURCE_SHA: ${{ steps.validated.outputs.sha }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+        run: |
+          node scripts/publish.mjs --out candidate --site history --revision "$SOURCE_SHA" --repository "$SOURCE_REPOSITORY"
+          node scripts/publish.mjs --verify --site history
+          node scripts/validated-run.mjs
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: history
+      - name: Store immutable distribution
+        env:
+          SOURCE_SHA: ${{ steps.validated.outputs.sha }}
+        run: |
+          cd history
+          git init -q
+          git checkout -qb registry-artifacts
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git remote add origin "https://github.com/$GH_REPO.git"
+          gh auth setup-git
+          if git ls-remote --exit-code --heads origin registry-artifacts > /dev/null; then
+            git fetch origin registry-artifacts
+            git update-ref refs/heads/registry-artifacts FETCH_HEAD
+          fi
+          git add latest.json manifests
+          if ! git diff --cached --quiet; then git commit -qm "Publish $SOURCE_SHA"; fi
+          git push origin HEAD:registry-artifacts
+      - name: Deploy verified distribution
+        id: deployment
+        uses: actions/deploy-pages@v4

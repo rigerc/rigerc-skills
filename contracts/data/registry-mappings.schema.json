@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "registry-mappings.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "technologies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "technology_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^[a-z0-9][a-z0-9._/-]*$"
+          },
+          "skill_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^[a-z0-9][a-z0-9._/-]*$"
+            },
+            "maxItems": 4096,
+            "minItems": 0,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "technology_id",
+          "skill_ids"
+        ]
+      },
+      "maxItems": 1024,
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "augmentations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "technology_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^[a-z0-9][a-z0-9._/-]*$"
+          },
+          "skill_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^[a-z0-9][a-z0-9._/-]*$"
+            },
+            "maxItems": 4096,
+            "minItems": 0,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "technology_id",
+          "skill_ids"
+        ]
+      },
+      "maxItems": 1024,
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "combinations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^[a-z0-9][a-z0-9._/-]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "requires": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^[a-z0-9][a-z0-9._/-]*$"
+            },
+            "maxItems": 32,
+            "minItems": 2,
+            "uniqueItems": true
+          },
+          "skill_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^[a-z0-9][a-z0-9._/-]*$"
+            },
+            "maxItems": 4096,
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "requires",
+          "skill_ids"
+        ]
+      },
+      "maxItems": 1024,
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "frontend_essentials": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512,
+        "pattern": "^[a-z0-9][a-z0-9._/-]*$"
+      },
+      "maxItems": 4096,
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "always_recommend": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512,
+        "pattern": "^[a-z0-9][a-z0-9._/-]*$"
+      },
+      "maxItems": 4096,
+      "minItems": 0,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version"
+  ]
+}

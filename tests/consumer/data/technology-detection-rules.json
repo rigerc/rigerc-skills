@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "technologies": [
+    {"id":"example-widget","name":"Example Widget","category":"Team tooling","signals":[{"type":"dependency","ecosystem":"npm","name":"@example/widget"},{"type":"path","path":"widget.config.json"}]},
+    {"id":"example-detect-only","name":"Example marker","category":"Team tooling","signals":[{"type":"path","path":".example-marker"}]}
+  ],
+  "augmentations": [{"technology_id":"react","signals":[{"type":"path","path":"team-react.config.json"}]}]
+}

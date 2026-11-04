@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "technologies": [{"technology_id":"example-widget","skill_ids":["example/team-skills/skills/example-review"]}],
+  "augmentations": [{"technology_id":"react","skill_ids":["example/team-skills/skills/example-review"]}],
+  "combinations": [{"id":"example-widget-react","name":"Widget and React review","requires":["example-widget","react"],"skill_ids":["example/team-skills/skills/example-review"]}],
+  "frontend_essentials": [],
+  "always_recommend": []
+}

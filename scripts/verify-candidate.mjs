@@ -1,0 +1,10 @@
+import {readFile} from 'node:fs/promises';
+import {verifyDistribution} from '../contracts/lib/publication.js';
+import {contract} from './lib/common.mjs';
+const {SOURCE_SHA,SOURCE_REPOSITORY,SOURCE_RUN}=process.env;
+const recorded=JSON.parse(await readFile('candidate/source.json','utf8'));
+if(recorded.repository!==SOURCE_REPOSITORY||recorded.revision!==SOURCE_SHA||recorded.run_id!==SOURCE_RUN)throw Error('Candidate artifact source binding mismatch');
+const pointer=await verifyDistribution('candidate/site',await contract());
+if(pointer.source_revision!==SOURCE_SHA)throw Error('Candidate pointer revision mismatch');
+const manifest=await readFile('candidate/manifest.json'),artifact=await readFile('candidate/site/'+pointer.artifact.path);
+if(!manifest.equals(artifact))throw Error('Candidate manifest differs from validated distribution');

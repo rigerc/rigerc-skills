@@ -1,0 +1,29 @@
+{
+  "bundle_version": 1,
+  "source_repository": "rigerc/nosey-6",
+  "source_revision": "3c076917060c1b6d4922718951adac9ba09a29bc",
+  "content_sha256": "333b462b8801458ad1085a2fadfc5e1f8e0350d1331b7629faf63c137222613d",
+  "catalog_identity": "b2e0ecb9518235499a82bd681b6b62ce737c8ac6",
+  "dependencies": {
+    "ajv": "8.20.0",
+    "yaml": "2.9.1",
+    "minimatch": "11.0.3"
+  },
+  "files": {
+    "data/custom-latest.schema.json": "51c240609866280bba1ff1a19f1400451a2a0c2316329970260569ca13a09873",
+    "data/custom-manifest.schema.json": "d8ec28d4a39e212f7a84b58360f0ac2d3b6e233e54c761d0256742b8650dbdc2",
+    "data/custom-registry.schema.json": "cbc189c88684c3036c77c07a1f90073ae8f80a6a283c977f9ba7eed8bb6f5253",
+    "data/registry-config.schema.json": "7524194d7374219d9fd6d0272f098a53ebf60d58c58a9a2597eb2dc3532c0934",
+    "data/registry-mappings.schema.json": "86d57a9a7b7c9e084f69d31894fea3a3c7e924c9dfad05afa63b662ae3361356",
+    "data/registry-rules.schema.json": "3ae57d89397ace6e622e5a4e7ea8ed64b942fee61623d93b5e472dd0b9b82ee1",
+    "inventory.json": "df6f5e8127ef3a475cc655bded84aa0055998e7bdc8eb7d74eac84bf9eb4136c",
+    "lib/compiler.js": "f20c9718a293c3ec4b610e48d769cd8cfc25baf06867cb9b603084a03fde7caf",
+    "lib/configure.js": "f8649ef9481ba93dc06dac79de09db284e78f0173022c75a7b2c325bc1c393a5",
+    "lib/contracts.js": "db890ab777ade21b12279dea4a46fe0fa26d63c0f9c876efd25567d04f9791e9",
+    "lib/identity.js": "1d17b3d925d20f624cb0df9c7636e07a08009b1e85ac28fb301d7b325155f465",
+    "lib/publication.js": "8314d58d166874404f1e9b1d37956c4d539e18ba6e137331b701bb2c32f15201",
+    "lib/skills.js": "4e9f8b834ca1094db0739748dcc96b292f3ef181e30afe791f46938c01bfe6b9",
+    "lib/validate.js": "f669432cdca187e3052f1edf1e412342f5bc4184312d9b8fc583022e92fa6d67",
+    "package.json": "f69ed17eea98f49ee075f676bae79df9cb779e54d5887b94d94313d34511170c"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "registry_id": "example/team-skills",
+  "skills": [
+    {
+      "id": "example/team-skills/skills/example-review",
+      "name": "example-review",
+      "description": "Review projects that use the team's widget conventions.",
+      "path": "skills/example-review",
+      "content_sha256": "f020a0c84829f45577e25f9c29271875b334858d5b955e7e408e759f7cebe302"
+    }
+  ],
+  "technologies": [
+    {
+      "id": "example-detect-only",
+      "name": "Example marker",
+      "category": "Team tooling",
+      "signals": [
+        {
+          "type": "path",
+          "path": ".example-marker"
+        }
+      ],
+      "skill_ids": []
+    },
+    {
+      "id": "example-widget",
+      "name": "Example Widget",
+      "category": "Team tooling",
+      "signals": [
+        {
+          "type": "dependency",
+          "ecosystem": "npm",
+          "name": "@example/widget"
+        },
+        {
+          "type": "path",
+          "path": "widget.config.json"
+        }
+      ],
+      "skill_ids": [
+        "example/team-skills/skills/example-review"
+      ]
+    }
+  ],
+  "augmentations": [
+    {
+      "technology_id": "react",
+      "signals": [
+        {
+          "type": "path",
+          "path": "team-react.config.json"
+        }
+      ],
+      "skill_ids": [
+        "example/team-skills/skills/example-review"
+      ]
+    }
+  ],
+  "combinations": [
+    {
+      "id": "example-widget-react",
+      "name": "Widget and React review",
+      "requires": [
+        "example-widget",
+        "react"
+      ],
+      "skill_ids": [
+        "example/team-skills/skills/example-review"
+      ]
+    }
+  ],
+  "frontend_essentials": [],
+  "always_recommend": []
+}

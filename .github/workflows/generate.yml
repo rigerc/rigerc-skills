@@ -1,0 +1,57 @@
+name: Propose generated registry update
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - skills/**
+      - data/**
+      - registry.config.json
+      - contracts/**
+      - scripts/**
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: registry-generation-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  generate:
+    if: github.event_name == 'workflow_dispatch' || (github.ref_name == github.event.repository.default_branch && github.actor != 'github-actions[bot]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Require selected source branch
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          test "$REF_TYPE" = branch
+          test "$REF_NAME" != registry-artifacts
+          case "$REF_NAME" in automation/registry-*) exit 1;; esac
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npm run check
+      - run: npm run test:consumer
+      - run: node scripts/generated-files.mjs
+      - name: Stable automation branch
+        id: branch
+        env:
+          SOURCE_BRANCH: ${{ github.ref_name }}
+        run: |
+          node --input-type=module -e 'import{createHash}from"node:crypto";import{appendFileSync}from"node:fs";appendFileSync(process.env.GITHUB_OUTPUT,"name=automation/registry-"+createHash("sha256").update(process.env.SOURCE_BRANCH).digest("hex").slice(0,16)+"\n")'
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          base: ${{ github.ref_name }}
+          branch: ${{ steps.branch.outputs.name }}
+          title: 'Regenerate custom registry index'
+          body: 'Regenerates registry.json from authored sources. Validation and the pinned consumer smoke passed on this candidate. Review before merging.'
+          commit-message: 'Regenerate registry index'
+          add-paths: |
+            registry.json
+            README.md

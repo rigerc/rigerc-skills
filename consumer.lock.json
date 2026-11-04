@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "package": "nosey-cli",
+  "version": "0.6.0-dev.0",
+  "status": "unreleased",
+  "integrity": null,
+  "note": "Development requires NOSEY_PACKAGE pointing to an exact candidate tarball. Pin the released version and npm integrity before enabling publication."
+}
