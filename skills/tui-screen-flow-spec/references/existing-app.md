@@ -4,7 +4,7 @@
 
 Reconstruct **what the TUI currently implements** in a readable and machine-readable contract. This workflow is for brownfield applications, documentation, audits, migration planning, and integrations. It does not implement the app, change behavior, or propose changes as if they already exist. If the user wants new behavior, document it as a separately marked proposed design.
 
-Default output scope is **contracts-only**. After inspecting implementation evidence, show an initial **provisional extraction plan** (surface, scope, provenance, known gaps), then interview the user, revise the plan after each round, and obtain explicit approval before authoring artifacts. Ask whether to reconstruct full screen layout trees and complete state-machine flows only when that additional work is materially relevant or requested. All output belongs at `<repo-root>/docs/plans/generated/tui/<feature-slug>/`.
+Default output scope is **contracts-only**. After inspecting implementation evidence, ask **structured questions about remaining scope/gaps first**, then show an initial **provisional extraction plan** (surface, scope, provenance, known gaps), revise it after subsequent answers, and obtain explicit approval before authoring artifacts. Ask whether to reconstruct full screen layout trees and complete state-machine flows only when that additional work is materially relevant or requested. All output belongs at `<repo-root>/docs/plans/generated/tui/<feature-slug>/`.
 
 ## 1. Establish trusted context and inspect source (read-only first)
 
@@ -25,7 +25,9 @@ Ask only material questions after inspection. In particular:
 - If code and tests disagree, which revision/behavior is authoritative?
 - Where unknown semantics would change data shapes, permissions, validation, or side effects, can the user confirm them?
 
-Before asking, present the evidence-grounded v0 plan with **observed** facts separated from **inferred/proposed** areas. Do not ask already-answered repository facts. Ask with a native question tool if present; otherwise use direct chat questions. After each answer, show an updated plan and delta, and interview again about remaining material gaps. Require explicit user approval of the consolidated plan before authoring files; record the plan revisions, question IDs, answers and approval in `DECISIONS.md`.
+Ask initial questions with bounded options and an Other path using the native structured-question tool if present; otherwise use numbered chat choices. **Do not ask already-answered repository facts.** After initial answers, present evidence-grounded v0 with **observed** facts separated from **inferred/proposed** areas. After subsequent answers, show a revised plan and delta, and interview again about remaining material gaps. Require explicit user approval of the consolidated plan before authoring files; record the plan revisions, question IDs, answers and approval in `DECISIONS.md`.
+
+For Go applications, inspect Bubble Tea v1/v2 imports, message/update/view handling and TUIWeave component usage where present. Apply [Go framework guidance](go-frameworks.md), but treat imported libraries as discovery hints rather than behavioral evidence.
 
 ## 3. Derive contracts in source-to-contract order
 
