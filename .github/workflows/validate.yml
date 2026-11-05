@@ -16,6 +16,10 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --ignore-scripts
+      - name: Diagnose registry mismatch
+        run: |
+          npm run build
+          git diff -- registry.json
       - run: npm run check
       - name: Test VHS CI installer
         run: python3 -m unittest discover -s skills/vhs-ci/tests -v
