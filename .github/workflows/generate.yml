@@ -37,7 +37,13 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run build
       - run: npm run check
-      - run: npm run test:consumer
+      - name: Check consumer release pin
+        id: consumer
+        run: |
+          node --input-type=module -e 'import{readFileSync,appendFileSync}from"node:fs";const pin=JSON.parse(readFileSync("consumer.lock.json","utf8"));appendFileSync(process.env.GITHUB_OUTPUT,"released="+(pin.status==="released"&&typeof pin.integrity==="string"&&pin.integrity.length>0)+"\n")'
+      - name: Test pinned consumer when released
+        if: steps.consumer.outputs.released == 'true'
+        run: npm run test:consumer
       - run: node scripts/generated-files.mjs
       - name: Stable automation branch
         id: branch

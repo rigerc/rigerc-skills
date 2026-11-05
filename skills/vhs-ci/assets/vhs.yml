@@ -1,0 +1,50 @@
+name: Record CLI demo with VHS
+
+# Template: scripts/install.py populates the CLI installation step.
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install CLI under test
+        shell: bash
+        run: |
+          set -euo pipefail
+          __INSTALL_COMMAND__
+      - name: Install VHS
+        uses: charmbracelet/vhs-action@v2.1.1
+        with:
+          version: v0.12.1
+      - name: Capture screenshots and videos
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd demos/vhs
+          mkdir -p outputs/screens
+          vhs demo.tape
+          test -s outputs/demo.gif
+          test -s outputs/demo.mp4
+          test -s outputs/screens/01-demo.png
+          ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 outputs/demo.mp4
+          file --mime-type outputs/screens/01-demo.png | grep -q 'image/png'
+      - name: Upload VHS evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vhs-cli-demo-${{ github.run_id }}
+          path: demos/vhs/outputs/
+          if-no-files-found: warn
+          retention-days: 7

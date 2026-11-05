@@ -76,8 +76,9 @@
     {
       "technology_id": "vhs",
       "skill_ids": [
-        "rigerc/rigerc-skills/skills/vhs-cli",
-        "rigerc/rigerc-skills/skills/tui-vhs-audit"
+        "rigerc/rigerc-skills/skills/tui-vhs-audit",
+        "rigerc/rigerc-skills/skills/vhs-ci",
+        "rigerc/rigerc-skills/skills/vhs-cli"
       ]
     }
   ],

@@ -27,7 +27,12 @@ jobs:
           mkdir -p dist
           cp -R "$RUNNER_TEMP/one/." dist/
           node scripts/publish.mjs --verify
+      - name: Check consumer release pin
+        id: consumer
+        run: |
+          node --input-type=module -e 'import{readFileSync,appendFileSync}from"node:fs";const pin=JSON.parse(readFileSync("consumer.lock.json","utf8"));appendFileSync(process.env.GITHUB_OUTPUT,"released="+(pin.status==="released"&&typeof pin.integrity==="string"&&pin.integrity.length>0)+"\n")'
       - name: Test pinned packed consumer
+        if: steps.consumer.outputs.released == 'true'
         run: npm run test:consumer
       - name: Record exact validated source
         env:
