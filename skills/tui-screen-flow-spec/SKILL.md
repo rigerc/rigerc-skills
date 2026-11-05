@@ -1,6 +1,6 @@
 ---
 name: tui-screen-flow-spec
-description: Design or document framework-agnostic terminal experiences: fullscreen TUIs and inline (non-fullscreen) CLIs. Generate source-backed UI, state, event, command, data, and validation contracts from existing applications, or plan new TUI screens with full state-machine flows. Present a provisional plan first, interview the user in iterative rounds, obtain plan approval before generating, then validate contracts and create a standalone interactive HTML contract explorer. Store design artifacts under docs/plans/generated/tui at the repository root. Use for fullscreen TUI and inline CLI design, audits, reverse-engineering, contract extraction, and handoffs.
+description: Design or document framework-agnostic terminal experiences fullscreen TUIs and inline (non-fullscreen) CLIs. Generate source-backed UI, state, event, command, data, and validation contracts from existing applications, or plan new TUI screens with full state-machine flows. Present a provisional plan first, interview the user in iterative rounds, obtain plan approval before generating, then validate contracts and create a standalone interactive HTML contract explorer. Store design artifacts under docs/plans/generated/tui at the repository root. Use for fullscreen TUI and inline CLI design, audits, reverse-engineering, contract extraction, and handoffs.
 compatibility: Agent Skills agent with filesystem access; Node.js 18+ to generate HTML and orchestrate workflows; Python 3.9+ to validate. No third-party dependencies.
 ---
 
