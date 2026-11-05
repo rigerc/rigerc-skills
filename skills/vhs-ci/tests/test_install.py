@@ -50,7 +50,7 @@ class InstallTests(unittest.TestCase):
         self.assertIn("refusing to overwrite", result.stderr)
 
     def test_rejects_marker_in_command(self):
-        result = self.run_install("--wait-for", "--help")
+        result = self.run_install("--wait-for", "mycli")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("false-positive wait", result.stderr)
         self.assertFalse((self.repo / "demos").exists())
