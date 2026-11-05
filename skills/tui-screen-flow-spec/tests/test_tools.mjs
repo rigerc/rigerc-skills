@@ -49,7 +49,7 @@ test('portable skill root follows metadata and packaging conventions',()=>{
   assert.equal(path.basename(skillRoot),'tui-screen-flow-spec');
   const skill=fs.readFileSync(path.join(skillRoot,'SKILL.md'),'utf8');
   assert.match(skill,/^---\nname: tui-screen-flow-spec/m);
-  assert.match(skill,/version: "1\.5\.0"/);
+  assert.match(skill,/version: "1\.6\.0"/);
   assert.ok(fs.existsSync(path.join(skillRoot,'README.md')));
   assert.equal(fs.readdirSync(path.join(skillRoot,'.agents','prompts')).length,6);
 });
@@ -123,7 +123,7 @@ test('output is constrained to the feature directory and symlinks are rejected',
     assert.throws(()=>featureDir(root,'symlink-test'),/Symlink/);
   }finally{fs.rmSync(root,{recursive:true,force:true});}
 });
-test('installer and automated builds support both example modes',()=>{
+test('installer and automated builds support fullscreen, inline and contracts-only examples',()=>{
   const root=tmpRepo();try{
     const install=exec(root,'install');assert.equal(install.status,0,install.stderr);
     assert.ok(fs.existsSync(path.join(root,'.agents/skills/tui-screen-flow-spec/SKILL.md')));
@@ -132,7 +132,7 @@ test('installer and automated builds support both example modes',()=>{
     assert.notEqual(exec(root,'install').status,0,'install must not overwrite without --force');
     assert.equal(exec(root,'demo').status,0);
     const build=exec(root,'build','--all','--strict');assert.equal(build.status,0,build.stdout+'\n'+build.stderr);
-    for(const f of ['example-task-tracker','example-existing-app']){
+    for(const f of ['example-task-tracker','example-existing-app','example-inline-cli']){
       assert.ok(fs.existsSync(path.join(featureDir(root,f),'contracts-viewer.html')));
       const report=JSON.parse(fs.readFileSync(path.join(featureDir(root,f),'validation-report.json')));
       assert.equal(report.status,'pass');

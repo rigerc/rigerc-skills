@@ -2,6 +2,8 @@
 
 ## New feature
 
+Decide whether each view is fullscreen or inline before designing layout. Inline views use `presentation: "inline"`, `cli` metadata, scrolling output/prompt nodes and terminal exit codes. See [inline CLI workflow](inline-cli.md).
+
 1. Read the brief and present an **initial provisional plan (v0)** in conversation: scope, likely screens and flows, constraints, assumptions and alternatives. **Do this before asking the user design questions.** Follow the interview protocol in [elicitation.md](elicitation.md).
 2. Interview the user in focused rounds. After each reply, incorporate decisions into a visible **revised plan (v1, v2, …)**, briefly explain the delta, and ask the next material questions. Keep iterating until blockers are answered, delegated or removed from scope.
 3. Present the consolidated plan and request **explicit approval to generate**. If changes are requested, revise and interview again. Record the approved plan version, user sign-off and prior rounds in `DECISIONS.md` once writing begins. Do not scaffold or write generated artifacts before approval.

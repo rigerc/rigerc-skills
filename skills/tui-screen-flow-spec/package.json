@@ -1,9 +1,9 @@
 {
   "name": "tui-screen-flow-spec",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
   "type": "module",
-  "description": "Standalone Agent Skill for TUI screens, flows and contracts with an offline HTML explorer and termcn-backed mockup generation",
+  "description": "Agent Skill for fullscreen TUIs and inline CLI flows, contracts and semantic terminal previews",
   "engines": {
     "node": ">=18"
   },

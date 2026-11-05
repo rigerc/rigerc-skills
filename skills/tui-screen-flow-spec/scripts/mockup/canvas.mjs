@@ -6,13 +6,15 @@ export function charWidth(c){
 }
 export const terminalWidth=s=>[...String(s)].reduce((n,c)=>n+charWidth(c),0);
 export const safeText=s=>String(s??'').replace(/[\u0000-\u001f\u007f\u001b]/g,' ').replace(/\s+/g,' ');
+// Unlike full-screen widgets, CLI stdout may rely on exact indentation/spacing.
+export const safeInlineText=s=>String(s??'').replace(/\t/g,'    ').replace(/[\u0000-\u001f\u007f\u001b]/g,' ');
 export function createCanvas(width,height,role='fg'){
  return {width,height,rows:Array.from({length:height},()=>Array.from({length:width},()=>({ch:' ',role}))),clipped:false};
 }
-export function write(canvas,x,y,value,role='fg'){
+export function write(canvas,x,y,value,role='fg',preserveSpacing=false){
  if(y<0||y>=canvas.height){canvas.clipped=true;return;}
  let col=x;
- for(const c of safeText(value)){
+ for(const c of (preserveSpacing?safeInlineText(value):safeText(value))){
   const w=charWidth(c);if(!w)continue;
   if(col<0||col+w>canvas.width){canvas.clipped=true;col+=w;continue;}
   canvas.rows[y][col]={ch:c,role};

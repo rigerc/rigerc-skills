@@ -1,5 +1,5 @@
 /** Semantic component adapters. No third-party component runtime is loaded. */
-import {safeText} from './canvas.mjs';
+import {safeText,safeInlineText} from './canvas.mjs';
 const printers=new Map();
 const str=v=>v==null?'':typeof v==='object'?Array.isArray(v)?v.map(str).join(', '):JSON.stringify(v):String(v);
 function stateData(ctx,node){return ctx.fixture.data?.[node.data_ref];}
@@ -12,8 +12,24 @@ function details(ctx,node){
 }
 function linesFor(node,ctx){
  const {label,override,props,style,focused}=details(ctx,node),data=stateData(ctx,node),kind=node.kind;
- const rows=[];const add=(text,role='fg')=>rows.push({text:safeText(text),role});
- if(kind==='text'){
+ const rows=[];const add=(text,role='fg')=>rows.push({text:(ctx.screen.presentation==='inline'?safeInlineText(text):safeText(text)),role});
+ const addLines=(value,role='fg')=>String(value??'').split(/\r?\n/).forEach(line=>add(line,role));
+ if(kind==='command'){
+  add('$ '+str(override.text??ctx.screen.cli?.invocation??label),'accent');
+ }else if(kind==='output'){
+  const value=override.text??(node.data_ref?data:undefined);
+  if(value!==undefined)addLines(str(value),node.stream==='stderr'?'error':style.role||'fg');
+ }else if(kind==='prompt'){
+  const value=str(override.value??ctx.fixture.state?.[node.id]??props.value??'');
+  add('? '+label+(value?' '+value:'')+(focused?' ▌':''),focused?'accent':'fg');
+ }else if(kind==='spinner'){
+  add(str(override.text??('⠋ '+label)),'muted');
+ }else if(kind==='progress'){
+  const raw=override.value??data??props.value??0;
+  const v=Number(raw);
+  if(Number.isFinite(v)&&v>=0&&v<=100){const done=Math.round(v/10);add(label+' ['+'█'.repeat(done)+'░'.repeat(10-done)+'] '+Math.round(v)+'%','accent');}
+  else add(label+': [sample progress unavailable]','muted');
+ }else if(kind==='text'){
   const value=override.text??(node.data_ref?data:undefined);
   add(value===undefined?label:label+': '+str(value),style.role||'fg');
  }else if(kind==='list'){
@@ -55,7 +71,7 @@ function linesFor(node,ctx){
  }
  return rows;
 }
-for(const kind of ['text','list','input','button','status','checkbox','select','table','dialog'])printers.set(kind,linesFor);
+for(const kind of ['command','output','prompt','spinner','progress','text','list','input','button','status','checkbox','select','table','dialog'])printers.set(kind,linesFor);
 /** Adapter signature: (node, context) => [{text, role}] */
 export function registerMockupRenderer(kind,renderer){
  if(typeof kind!=='string'||!/^([a-z][a-z0-9-]*|(?:ink|opentui)\/[a-z0-9][a-z0-9-]*)$/.test(kind)||typeof renderer!=='function')throw new Error('Invalid mockup renderer');

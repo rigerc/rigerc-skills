@@ -256,8 +256,39 @@ def validate_folder(path: Path, feature: str, repo_root: Path | None = None) -> 
             v = min_size.get(dimension)
             check.expect(isinstance(v, int) and not isinstance(v, bool) and v > 0,
                          f"screens.{screen_id}.min_size.{dimension}: expected positive integer")
+        presentation = screen.get("presentation", "fullscreen")
+        check.expect(presentation in ("fullscreen", "inline"),
+                     f"screens.{screen_id}.presentation: expected fullscreen or inline")
+        cli = screen.get("cli")
+        if presentation == "inline":
+            if isinstance(cli, dict):
+                string_at(cli, "invocation", f"screens.{screen_id}.cli", check)
+                check.expect(cli.get("interaction") in ("batch", "prompted"),
+                             f"screens.{screen_id}.cli.interaction: expected batch or prompted")
+                check.expect(cli.get("stdin") in ("none", "pipe", "tty"),
+                             f"screens.{screen_id}.cli.stdin: expected none, pipe or tty")
+                if cli.get("interaction") == "prompted":
+                    check.expect(cli.get("stdin") == "tty",
+                                 f"screens.{screen_id}.cli: prompted interaction requires tty stdin")
+                for extra in cli.keys() - {"invocation", "interaction", "stdin"}:
+                    check.error(f"screens.{screen_id}.cli: unsupported property {extra!r}")
+            else:
+                check.error(f"screens.{screen_id}: inline presentation requires cli metadata")
+        elif cli is not None:
+            check.error(f"screens.{screen_id}: cli metadata requires inline presentation")
         nodes = check_nodes(screen_id, array_at(screen.get("regions"), f"screens.{screen_id}.regions", check), check)
         node_by_screen[screen_id] = nodes
+        for nid, node in nodes.items():
+            kind, stream = node.get("kind"), node.get("stream")
+            if stream is not None:
+                check.expect(kind == "output" and stream in ("stdout", "stderr"),
+                             f"screens.{screen_id}.{nid}: stream only supports output stdout/stderr")
+            if kind in ("command", "output", "prompt", "spinner", "progress"):
+                check.expect(presentation == "inline",
+                             f"screens.{screen_id}.{nid}: CLI node {kind!r} requires inline presentation")
+            if kind == "prompt" and isinstance(cli, dict):
+                check.expect(cli.get("interaction") == "prompted",
+                             f"screens.{screen_id}.{nid}: prompt requires prompted interaction")
         focus_order = array_at(screen.get("focus_order"), f"screens.{screen_id}.focus_order", check)
         if not all(isinstance(x, str) for x in focus_order):
             check.error(f"screens.{screen_id}: focus_order entries must be node ID strings")
@@ -306,6 +337,13 @@ def validate_folder(path: Path, feature: str, repo_root: Path | None = None) -> 
         check.expect(isinstance(state.get("terminal"), bool),
                      f"machine state {state_id}: terminal must be boolean")
         string_at(state, "description", f"machine.states.{state_id}", check)
+        exit_code = state.get("exit_code")
+        presentation = screens.get(state.get("screen"), {}).get("presentation", "fullscreen")
+        if presentation == "inline" and state.get("terminal") is True:
+            check.expect(isinstance(exit_code, int) and not isinstance(exit_code, bool) and 0 <= exit_code <= 255,
+                         f"machine.states.{state_id}: inline terminal state requires exit_code 0-255")
+        elif exit_code is not None:
+            check.error(f"machine.states.{state_id}: exit_code is only valid for terminal inline states")
     for gid, guard in guards.items():
         string_at(guard, "expression", f"guards.{gid}", check)
         string_at(guard, "description", f"guards.{gid}", check)

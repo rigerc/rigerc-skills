@@ -6,10 +6,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {getBundle,featureDir,requireFeature,resolveRepoRoot,parseArgs} from './generate-html.mjs';
-import {renderFlexibleSnapshot} from './mockup/layout.mjs';
+import {renderFlexibleSnapshot,renderInlineSnapshot} from './mockup/layout.mjs';
 import {svgCanvasSnapshot,ansiSnapshot} from './mockup/outputs.mjs';
 import {validatePresentationConfig} from './mockup/validate-config.mjs';
 import {colorRuns} from './mockup/canvas.mjs';
+import {footerGeometry} from './mockup/footer.mjs';
 export {registerMockupRenderer} from './mockup/renderers.mjs';
 
 const DEFAULT_THEMES={
@@ -63,11 +64,17 @@ export function renderSnapshot(screen,state,fixture={},options={}){
  if(!Number.isInteger(cols)||!Number.isInteger(rows)||cols<20||cols>240||rows<8||rows>90)throw new Error('Viewport must be 20-240 cols and 8-90 rows');
  const violations=[];if(cols<screen.min_size.cols||rows<screen.min_size.rows)violations.push(`Below declared minimum ${screen.min_size.cols}×${screen.min_size.rows}`);
  const inner=cols-4;
- const raw=[` ${screen.title} / ${state.id}${state.terminal?' [TERMINAL]':''}`,'─'.repeat(Math.max(0,Math.min(inner,cols-4))), ...(state.terminal?['Flow ended (terminal state).']:screen.regions.flatMap(r=>lineNodes(r,{state,fixture,design:options.design,screen},0))), '',...screen.keybindings.map(k=>`${k.key} → ${k.event}`)];
- let clipped=raw.some(s=>cellWidth(s)>inner)||raw.length>rows-2;
- const lines=['┌'+'─'.repeat(cols-2)+'┐',...raw.slice(0,rows-2).map(s=>'│ '+fit(s,inner)+' │')];
- while(lines.length<rows-1)lines.push('│ '+fit('',inner)+' │');
- lines.push('└'+'─'.repeat(cols-2)+'┘');
+ const body=state.terminal?['Flow ended (terminal state).']:screen.regions.flatMap(r=>lineNodes(r,{state,fixture,design:options.design,screen},0));
+ const footer=footerGeometry(screen.keybindings,inner,rows);
+ let clipped=body.some(s=>cellWidth(s)>inner)||body.length>footer.bodyRows||footer.clipped;
+ const content=Array(rows-2).fill('');
+ content[0]=` ${screen.title} / ${state.id}${state.terminal?' [TERMINAL]':''}`;
+ content[1]='─'.repeat(inner);
+ for(let i=0;i<Math.min(body.length,footer.bodyRows);i++)content[i+2]=body[i];
+ if(footer.divider!==null)content[footer.divider-1]='─'.repeat(inner);
+ for(const [i,line]of footer.lines.entries())content[footer.start+i-1]=line;
+ if(cellWidth(content[0])>inner)clipped=true;
+ const lines=['┌'+'─'.repeat(cols-2)+'┐',...content.map(s=>'│ '+fit(s,inner)+' │'),'└'+'─'.repeat(cols-2)+'┘'];
  if(clipped)violations.push('Preview content clipped at selected viewport');
  return {text:lines.join('\n'),lines,clipped,warnings:violations};
 }
@@ -120,12 +127,13 @@ function snapshots(bundle,scenarios,options,selection){
   const screen=screenIndex.get(state.screen),variants=[],modern=modernLayout(options.design,screen);
   for(const [viewport,dimensions]of Object.entries(selection.viewports))for(const scenario of selection.variants){
    const fixture=stateFixture(scenarios,state,scenario);
-   const preview=(modern?renderFlexibleSnapshot:renderSnapshot)(screen,state,fixture,{...options,...dimensions,viewport});
+   const renderer=screen.presentation==='inline'?renderInlineSnapshot:modern?renderFlexibleSnapshot:renderSnapshot;
+   const preview=renderer(screen,state,fixture,{...options,...dimensions,viewport});
    variants.push({viewport,scenario,preview,fixtureType:scenarios?.states?.[state.id]||scenarios?.stateVariants?.[state.id]?.[scenario]?'declared sample':'generated fallback'});
   }
-  return {...state,screenTitle:screen.title,preview:variants[0].preview,variants,fixtureType:variants[0].fixtureType};
+  return {...state,screenTitle:screen.title,presentation:screen.presentation||'fullscreen',cli:screen.cli||null,preview:variants[0].preview,variants,fixtureType:variants[0].fixtureType};
  });
- return {screens:screens.map(s=>({id:s.id,title:s.title,states:allStates.filter(t=>t.screen===s.id).map(t=>t.id)})),states:allStates,transitions,initial:bundle.machine.initial,mappingWarnings,viewports:Object.keys(selection.viewports),scenarios:selection.variants};
+ return {screens:screens.map(s=>({id:s.id,title:s.title,presentation:s.presentation||'fullscreen',cli:s.cli||null,states:allStates.filter(t=>t.screen===s.id).map(t=>t.id)})),states:allStates,transitions,initial:bundle.machine.initial,mappingWarnings,viewports:Object.keys(selection.viewports),scenarios:selection.variants};
 }
 function svgSnapshot(state,theme){const lines=state.preview.lines,cols=lines[0]?cellWidth(lines[0]):80;
  const w=cols*9+40,h=lines.length*19+42;
@@ -145,13 +153,13 @@ function stylesheet(){return `<style>
 @media(max-width:970px){main{display:block}.comparison .compare-grid{grid-template-columns:1fr}aside{position:static;margin-bottom:16px;max-height:none}.lane .states{grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr))}}
 </style>`;}
 function generateHTML(model,themes,chosen){
- const view=model.screens.map(screen=>`<section class="lane" id="screen-${xml(screen.id)}"><h2>${xml(screen.title)} <small>${screen.states.length} state${screen.states.length===1?'':'s'}</small></h2><div class="states">${screen.states.map(id=>{
+ const view=model.screens.map(screen=>`<section class="lane" id="screen-${xml(screen.id)}"><h2>${xml(screen.title)} <small>${xml(screen.presentation)} · ${screen.states.length} state${screen.states.length===1?'':'s'}</small></h2><div class="states">${screen.states.map(id=>{
  const s=model.states.find(x=>x.id===id);
  const outgoing=model.transitions.filter(t=>t.from===s.id);
  return `<article class="card" id="state-${xml(s.id)}" data-state="${xml(s.id)}" data-screen="${xml(s.screen)}"><h3><span>${xml(s.id)}</span><span class="badge">${s.terminal?'TERMINAL':s.fixtureType}</span></h3><p>${xml(s.description||'')}</p><div class="terminal"><pre>${previewMarkup(s.preview)}</pre></div><div class="edges">${outgoing.map(t=>`<button type="button" class="edge" data-transition="${xml(t.id)}" title="${xml(t.description||'')}">${xml(t.event)} → ${xml(t.to)}</button>`).join('')||'<span class="note">No outgoing transitions</span>'}<button type="button" class="edge compare-action" data-compare="${xml(s.id)}">Compare</button></div>${s.preview.warnings.map(w=>`<p class="warn">${xml(w)}</p>`).join('')}</article>`;}).join('')}</div></section>`).join('');
  const profiles=Object.keys(themes);const colors={...themes[chosen]};
  const browserModel={...model,states:model.states.map(s=>({...s,preview:{text:s.preview.text,warnings:s.preview.warnings,runs:previewRuns(s.preview)},variants:s.variants.map(v=>({...v,preview:{text:v.preview.text,warnings:v.preview.warnings,runs:previewRuns(v.preview)}}))}))};
- const html=`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TUI screen-flow storyboard</title>${stylesheet()}</head><body><header><div><h1>Screen-flow storyboard</h1><small>${model.screens.length} screens · ${model.states.length} states · ${model.transitions.length} transitions · semantic preview, not runtime capture</small></div><div class="controls"><label for="find">Find state</label><input id="find" placeholder="Filter states…"><label for="profile">Theme</label><select id="profile">${profiles.map(p=>`<option value="${xml(p)}" ${p===chosen?'selected':''}>${xml(p)}</option>`).join('')}</select>${model.viewports.length>1?`<label for="viewport">Viewport</label><select id="viewport">${model.viewports.map(v=>`<option value="${xml(v)}">${xml(v)}</option>`).join('')}</select>`:''}${model.scenarios.length>1?`<label for="scenario">Scenario</label><select id="scenario">${model.scenarios.map(v=>`<option value="${xml(v)}">${xml(v)}</option>`).join('')}</select>`:''}</div></header><main><div id="story"><section id="comparison" class="comparison" hidden><h2>Side-by-side comparison</h2><p id="compare-note" class="note">Select a second state to compare.</p><div id="compare-grid" class="compare-grid"></div><button class="edge" id="clear-compare" type="button">Clear comparison</button></section>${view}</div><aside aria-live="polite"><h2>Selection inspector</h2><p class="note">Select a state or transition to inspect the canonical metadata.</p><pre id="details">Initial state: ${xml(model.initial)}</pre><h3>Component adapter status</h3><p class="note">termcn is a schema source; these snapshots are semantic approximations, not live Ink/OpenTUI captures.</p>${model.mappingWarnings.map(w=>`<p class="warn">${xml(w)}</p>`).join('')}</aside></main><footer>Self-contained offline output · No application commands are executed · Sample data is illustrative</footer><script>const MODEL=${jsonForScript(browserModel)};const THEMES=${jsonForScript(themes)};
+ const html=`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Terminal interaction storyboard</title>${stylesheet()}</head><body><header><div><h1>Terminal interaction storyboard</h1><small>${model.screens.length} views · ${model.states.length} states · ${model.transitions.length} transitions · semantic preview, not runtime capture</small></div><div class="controls"><label for="find">Find state</label><input id="find" placeholder="Filter states…"><label for="profile">Theme</label><select id="profile">${profiles.map(p=>`<option value="${xml(p)}" ${p===chosen?'selected':''}>${xml(p)}</option>`).join('')}</select>${model.viewports.length>1?`<label for="viewport">Viewport</label><select id="viewport">${model.viewports.map(v=>`<option value="${xml(v)}">${xml(v)}</option>`).join('')}</select>`:''}${model.scenarios.length>1?`<label for="scenario">Scenario</label><select id="scenario">${model.scenarios.map(v=>`<option value="${xml(v)}">${xml(v)}</option>`).join('')}</select>`:''}</div></header><main><div id="story"><section id="comparison" class="comparison" hidden><h2>Side-by-side comparison</h2><p id="compare-note" class="note">Select a second state to compare.</p><div id="compare-grid" class="compare-grid"></div><button class="edge" id="clear-compare" type="button">Clear comparison</button></section>${view}</div><aside aria-live="polite"><h2>Selection inspector</h2><p class="note">Select a state or transition to inspect the canonical metadata.</p><pre id="details">Initial state: ${xml(model.initial)}</pre><h3>Component adapter status</h3><p class="note">termcn is a schema source; these snapshots are semantic approximations, not live Ink/OpenTUI captures.</p>${model.mappingWarnings.map(w=>`<p class="warn">${xml(w)}</p>`).join('')}</aside></main><footer>Self-contained offline output · No application commands are executed · Sample data is illustrative</footer><script>const MODEL=${jsonForScript(browserModel)};const THEMES=${jsonForScript(themes)};
 const applyTheme=name=>{const t=THEMES[name];if(!t)return;document.querySelectorAll('.terminal').forEach(e=>{e.style.setProperty('--mock-bg',t.bg);e.style.setProperty('--mock-fg',t.fg);e.style.setProperty('--mock-border',t.border);e.style.setProperty('--mock-muted',t.muted);e.style.setProperty('--mock-accent',t.accent);e.style.setProperty('--mock-error',t.error);});};
 applyTheme(${jsonForScript(chosen)});document.getElementById('profile').addEventListener('change',e=>applyTheme(e.target.value));
 const renderRuns=(pre,runs)=>{pre.replaceChildren();for(const [i,row] of runs.entries()){if(i)pre.append(document.createTextNode('\\n'));for(const run of row){const span=document.createElement('span');span.className='role-'+(['fg','border','accent','error','muted'].includes(run.role)?run.role:'fg');span.textContent=run.text;pre.appendChild(span);}}};
@@ -163,7 +171,7 @@ const setPreview=()=>{const viewport=document.getElementById('viewport')?.value|
 for(const id of ['viewport','scenario'])document.getElementById(id)?.addEventListener('change',setPreview);
 document.querySelectorAll('[data-compare]').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.compare;const old=selectedCompare.indexOf(id);if(old>=0)selectedCompare.splice(old,1);else {if(selectedCompare.length===2)selectedCompare.shift();selectedCompare.push(id);}renderComparison();}));document.getElementById('clear-compare').addEventListener('click',()=>{selectedCompare.length=0;renderComparison();});
 const details=document.getElementById('details');document.getElementById('find').addEventListener('input',e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('.card').forEach(c=>{const s=MODEL.states.find(x=>x.id===c.dataset.state);c.hidden=!(s.id.toLowerCase().includes(q)||s.description?.toLowerCase().includes(q));});});
-const choose=(id)=>{document.querySelectorAll('.card.active').forEach(c=>c.classList.remove('active'));const s=MODEL.states.find(x=>x.id===id);if(!s)return;const el=document.getElementById('state-'+id);el?.classList.add('active');details.textContent=JSON.stringify({state:s.id,screen:s.screen,description:s.description,terminal:s.terminal,fixture:s.fixtureType,preview_warnings:s.preview.warnings,outgoing:MODEL.transitions.filter(t=>t.from===id)},null,2);};
+const choose=(id)=>{document.querySelectorAll('.card.active').forEach(c=>c.classList.remove('active'));const s=MODEL.states.find(x=>x.id===id);if(!s)return;const el=document.getElementById('state-'+id);el?.classList.add('active');details.textContent=JSON.stringify({state:s.id,screen:s.screen,description:s.description,terminal:s.terminal,exit_code:s.exit_code??null,presentation:s.presentation,cli:s.cli,fixture:s.fixtureType,preview_warnings:s.preview.warnings,outgoing:MODEL.transitions.filter(t=>t.from===id)},null,2);};
 document.querySelectorAll('.card').forEach(c=>c.addEventListener('click',e=>{if(!e.target.closest('button.edge'))choose(c.dataset.state)}));
 document.querySelectorAll('button.edge').forEach(b=>b.addEventListener('click',()=>{const t=MODEL.transitions.find(x=>x.id===b.dataset.transition);if(!t)return;choose(t.to);details.textContent=JSON.stringify(t,null,2);document.getElementById('state-'+t.to)?.scrollIntoView({behavior:'smooth',block:'center'});}));
 choose(MODEL.initial);</script></body></html>`;
@@ -180,7 +188,7 @@ export function generateMockups({repoRoot,feature,cols,rows,theme='dark',viewpor
  for(const state of data.states)for(const variant of state.variants){
   const name=[state.id,...(multiple?[variant.viewport,variant.scenario]:[])].join('.').replace(/[^a-zA-Z0-9_.-]/g,'_');
   if(usedNames.has(name))throw new Error('Duplicate preview output name: '+name);usedNames.add(name);
-  const item={state:state.id,screen:state.screen,viewport:variant.viewport,scenario:variant.scenario,warnings:variant.preview.warnings};
+  const item={state:state.id,screen:state.screen,presentation:state.presentation,exit_code:state.exit_code??null,viewport:variant.viewport,scenario:variant.scenario,warnings:variant.preview.warnings};
   for(const format of ['txt','svg','ansi'])if(selection.outputs.includes(format)){
    const file=path.join(outputDir,name+'.'+format);safeOutput(file);
    const output=format==='txt'?variant.preview.text+'\n':format==='svg'?(variant.preview.cells?svgCanvasSnapshot(variant.preview,themes[theme],state.id):svgSnapshot({...state,preview:variant.preview},themes[theme])):ansiSnapshot(variant.preview,themes[theme]);
@@ -189,7 +197,7 @@ export function generateMockups({repoRoot,feature,cols,rows,theme='dark',viewpor
   items.push(item);
  }
  const first=Object.values(selection.viewports)[0];
- const manifest={schema_version:'1.1.0',generator:'semantic-tui-mockup-v1.5',source:'canonical screens.json + machine.json',note:'Mockups are semantic previews, not termcn runtime captures.',viewport:first,viewports:selection.viewports,scenarios:selection.variants,outputs:selection.outputs,theme,components_cataloged:catalog?.components?.length||0,screen_count:data.screens.length,state_count:data.states.length,variant_count:items.length,transition_count:data.transitions.length,items,mapping_warnings:data.mappingWarnings};
+ const manifest={schema_version:'1.1.0',generator:'semantic-terminal-mockup-v1.6',source:'canonical screens.json + machine.json',note:'Mockups are semantic previews, not termcn runtime captures.',viewport:first,viewports:selection.viewports,scenarios:selection.variants,outputs:selection.outputs,theme,components_cataloged:catalog?.components?.length||0,screen_count:data.screens.length,state_count:data.states.length,variant_count:items.length,transition_count:data.transitions.length,presentations:[...new Set(data.screens.map(s=>s.presentation))],items,mapping_warnings:data.mappingWarnings};
  safeOutput(path.join(outputDir,'index.json'));fs.writeFileSync(path.join(outputDir,'index.json'),JSON.stringify(manifest,null,2)+'\n');
  let htmlPath=null;if(selection.outputs.includes('html')){
   htmlPath=path.join(dir,'storyboard.html');safeOutput(htmlPath);fs.writeFileSync(htmlPath,generateHTML(data,themes,theme));addManifestFiles(dir,['storyboard.html']);

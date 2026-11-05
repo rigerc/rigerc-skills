@@ -1,8 +1,8 @@
-# TUI Screen & Flow Contract Skill
+# Terminal Screen, Inline CLI & Flow Contract Skill
 
-A **standalone, framework-agnostic Agent Skills package** that produces screen specifications, state machines, and typed contracts for both new and existing terminal applications. It includes a **dependency-free Node.js HTML generator** for exploring contracts offline, a Python validator, reusable templates and JSON Schemas, agent workflow prompts, and runnable examples.
+A **standalone, framework-agnostic Agent Skills package** that produces view specifications, state machines, and typed contracts for **fullscreen TUIs and inline, non-fullscreen CLIs** in both new and existing terminal applications. It includes a **dependency-free Node.js HTML generator** for exploring contracts offline, a Python validator, reusable templates and JSON Schemas, agent workflow prompts, and runnable examples.
 
-No application code is generated or executed. Optional termcn-backed props schemas and screen/state mockups can now be generated without executing the target application. The agent **presents a provisional plan first, interviews the user, visibly revises the plan, and gets approval** before authoring contracts; the scripts automate preparation, validation, visualization, and packaging tasks.
+No application code is generated or executed. Existing fullscreen definitions remain compatible: omitting `presentation` still means `fullscreen`. Optional termcn-backed props schemas and screen/state mockups can now be generated without executing the target application. The agent **presents a provisional plan first, interviews the user, visibly revises the plan, and gets approval** before authoring contracts; the scripts automate preparation, validation, visualization, and packaging tasks.
 
 ## Requirements
 
@@ -40,9 +40,31 @@ tui-screen-flow-spec/
 └── tests/                       # Python + Node regression tests
 ```
 
+## Inline CLI, not just fullscreen TUI (1.6.0)
+
+Inline CLI mockups model **commands that print into existing shell scrollback**, including noninteractive batches and TTY prompts, rather than occupying a terminal-sized frame. They share the same machine/event/command contracts as TUIs but have different display and I/O semantics:
+
+- `screens.json`: set `"presentation": "inline"` plus `"cli": {"invocation":"shipctl deploy --env staging", "interaction":"batch", "stdin":"none"}`. Prompted views use `"interaction":"prompted", "stdin":"tty"`. A flow can mix inline and fullscreen views.
+- Inline semantic nodes: `command`, `output` (`stream: "stdout"` / `"stderr"`), `prompt`, `spinner`, `progress` (plus standard `text`, `container`, etc.). `scenarios.json` controls per-state sample output, prompt text/values, progress and visibility; multiline output is supported.
+- `machine.json`: terminal inline states must declare `"exit_code"` in 0–255. Exit codes are metadata, not extra printed lines.
+- Preview snapshots use **content-based height, no fullscreen border/title, and no pinned footer**. Width influences wrapping; the `rows` viewport setting never truncates inline transcripts. Spinners and progress indicate a sampled moment, not an actual animation or live subprocess.
+
+```bash
+# After the user has approved the specification plan, create a draft for an inline CLI
+node scripts/tui.mjs scaffold --repo-root /path/to/repo \
+  --feature deploy-cli --mode greenfield --surface inline
+
+# Load and validate the bundled inline example and create its storyboard
+node scripts/tui.mjs demo --repo-root /path/to/repo
+node scripts/tui.mjs build --repo-root /path/to/repo \
+  --feature example-inline-cli --strict
+```
+
+The sample `examples/example-inline-cli/` demonstrates TTY confirmation, in-place progress, successful stdout, failure stderr, cancellation, and exit statuses. The CLI schema documents invocation and input mode, but command flags, output formats, terminal capabilities, pipes, signals and other detailed behavior must be specified in the canonical contracts and the prose spec. See [inline CLI guidance](references/inline-cli.md).
+
 ## termcn-backed component schemas and automatic mockups
 
-**Added in 1.4.0; flexible previews in 1.5.0.** Full-mode features can generate termcn-derived JSON Schemas and an interactive **screen-flow storyboard**, with per-state SVG and plain-text terminal mockups. The importer handles shadcn registry items for the Ink and OpenTUI targets. **These are semantic mockups, not screenshots of live termcn components**; actual framework output may differ.
+**Added in 1.4.0; flexible previews in 1.5.0; inline CLI support in 1.6.0.** Full-mode features can generate termcn-derived JSON Schemas and an interactive **screen-flow storyboard**, with per-state SVG and plain-text terminal mockups. The importer handles shadcn registry items for the Ink and OpenTUI targets. **These are semantic mockups, not screenshots of live termcn components**; actual framework output may differ. For fullscreen previews, the keyboard help footer is bottom-aligned and arranges shortcuts horizontally, wrapping between entries for narrower terminals.
 
 Quick start (run from the skill directory):
 
@@ -212,11 +234,11 @@ node scripts/tui.mjs watch --repo-root /path/to/repo --all
 # Only render (even if the feature is still draft)
 node scripts/generate-html.mjs --repo-root /path/to/repo --feature task-editor
 
-# Optional: install two bundled examples into target repository's generated output tree
+# Optional: install all three bundled examples into target repository's generated output tree
 node scripts/tui.mjs demo --repo-root /path/to/repo
 ```
 
-The `inventory` command performs a bounded, read-only scan of code files and prints likely TUI entrypoints, keyboard handlers, navigation, state, and data/validation source line references. **It is not proof of behavior or automatic contract extraction.** The agent must inspect the actual implementation and ask material questions.
+The `inventory` command performs a bounded, read-only scan of code files and prints likely terminal UI/CLI entrypoints, keyboard handlers, navigation, state, and data/validation source line references. **It is not proof of behavior or automatic contract extraction.** The agent must inspect the actual implementation and ask material questions.
 
 `build` runs the Python consistency validator and writes an HTML snapshot containing the validation status; it **also renders if validation fails** so draft contracts are inspectable. Add `--strict` for a failing exit status when errors are detected (suitable for CI). `validate` alone returns a failure status on invalid contracts. `watch` observes canonical JSON inputs, not application source; rerun extraction when source code changes.
 
@@ -259,7 +281,7 @@ These are ready for use individually after installation into `.agents/prompts/`.
 
 ## Example workflows and tests
 
-`examples/example-task-tracker/` illustrates a completed greenfield flow. `examples/example-existing-app/` illustrates evidence-backed extraction from `tests/fixtures/existing_app.py`. To validate the latter, first install the skill in a target repository, so the fixture appears at its expected repository-relative path, then copy the example using `demo`. These are bundled reference assets; generated work always goes into `docs/plans/generated/tui/<feature-slug>/` in a target repository.
+`examples/example-task-tracker/` illustrates a completed fullscreen greenfield flow. `examples/example-inline-cli/` illustrates an inline CLI flow, with a prompt and stream-specific success/error snapshots. `examples/example-existing-app/` illustrates evidence-backed extraction from `tests/fixtures/existing_app.py`. To validate the latter, first install the skill in a target repository, so the fixture appears at its expected repository-relative path, then copy the example using `demo`. These are bundled reference assets; generated work always goes into `docs/plans/generated/tui/<feature-slug>/` in a target repository.
 
 ```bash
 node scripts/tui.mjs test

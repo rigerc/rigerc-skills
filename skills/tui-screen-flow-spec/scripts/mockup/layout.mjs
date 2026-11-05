@@ -1,6 +1,7 @@
 /** Configurable layout tree. Geometry is in terminal cells, not pixels. */
 import {createCanvas,write,paste,border,lines,terminalWidth} from './canvas.mjs';
 import {renderComponent} from './renderers.mjs';
+import {footerGeometry} from './footer.mjs';
 
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const whole=(v,fallback=0)=>Number.isInteger(v)&&v>=0?v:fallback;
@@ -37,11 +38,11 @@ function nodeBlock(node,ctx,availableWidth,level=0){
  const contentWidth=Math.max(1,width-2*p-2*b);
  if(node.kind!=='container'){
   const sample=renderComponent(node,ctx);
-  const contentRows=sample.flatMap(row=>wrapString(row.text,contentWidth,style.wrap===true).map(text=>({text,role:style.role||row.role})));
+  const contentRows=sample.flatMap(row=>wrapString(row.text,contentWidth,(style.wrap===true||(style.wrap===undefined&&ctx.screen.presentation==='inline'))).map(text=>({text,role:style.role||row.role})));
   const cutoff=style.maxHeight?Math.max(0,style.maxHeight-2*p-2*b):Infinity;
   const used=contentRows.slice(0,cutoff);
   const content=createCanvas(contentWidth,Math.max(1,used.length));
-  for(const [i,row]of used.entries())write(content,alignX(row.text,contentWidth,style.align),i,row.text,row.role);
+  for(const [i,row]of used.entries())write(content,alignX(row.text,contentWidth,style.align),i,row.text,row.role,ctx.screen.presentation==='inline');
   if(used.length<contentRows.length)content.clipped=true;
   return finish(content,width,style);
  }
@@ -96,15 +97,37 @@ export function renderFlexibleSnapshot(screen,state,fixture={},options={}){
  const frame=createCanvas(cols,rows);border(frame,'single','border');
  write(frame,2,1,` ${screen.title} / ${state.id}${state.terminal?' [TERMINAL]':''}`,'accent');
  write(frame,2,2,'─'.repeat(inner),'border');
- const footerLines=screen.keybindings.map(k=>k.key+' → '+k.event);
- const usable=Math.max(0,rows-5-footerLines.length);
+ const footer=footerGeometry(screen.keybindings,inner,rows);
  const bodyHeight=state.terminal?1:raw.height;
- const visible=Math.min(bodyHeight,usable);
+ const visible=Math.min(bodyHeight,footer.bodyRows);
  if(state.terminal){if(visible)write(frame,2,3,'Flow ended (terminal state).','muted');}
  else for(let y=0;y<visible;y++)for(let x=0;x<raw.width;x++)frame.rows[y+3][x+2]={...raw.rows[y][x]};
- const footer=4+visible;
- for(const [i,line]of footerLines.entries())write(frame,2,footer+i,line,'muted');
- if(frame.clipped||raw.clipped||bodyHeight>visible)violations.push('Preview content clipped at selected viewport');
+ if(footer.divider!==null)write(frame,2,footer.divider,'─'.repeat(inner),'border');
+ for(const [i,line]of footer.lines.entries())write(frame,2,footer.start+i,line,'muted');
+ if(frame.clipped||raw.clipped||bodyHeight>visible||footer.clipped)violations.push('Preview content clipped at selected viewport');
  const outputLines=lines(frame);
  return {text:outputLines.join('\n'),lines:outputLines,cells:frame,clipped:violations.some(x=>x.includes('clipped')),warnings:violations};
+}
+
+/** Inline CLI transcript: content flows in the scrollback; rows is not a screen limit.
+ * No outer border, title bar, pinned key-help, or fake output for terminal states.
+ * Each state is a snapshot of the declared output/prompt at that point, not
+ * cumulative replay of machine transitions. Exit status stays metadata only.
+ */
+export function renderInlineSnapshot(screen,state,fixture={},options={}){
+ const cols=options.cols??80, rows=options.rows??24;
+ if(!Number.isInteger(cols)||cols<20||cols>240||!Number.isInteger(rows)||rows<8||rows>90)throw new Error('Viewport must be 20-240 cols and 8-90 rows');
+ const warnings=[];
+ if(cols<screen.min_size.cols)warnings.push(`Below declared minimum width ${screen.min_size.cols} columns`);
+ const ctx={screen,state,fixture,design:options.design||{},preview:options.design?.preview||{},viewport:options.viewport||'default'};
+ const blocks=screen.regions.filter(n=>!fixture.components?.[n.id]?.hidden).map(n=>nodeBlock(n,ctx,cols));
+ const content=createCanvas(cols,Math.max(1,blocks.reduce((height,b)=>height+b.height,0)));
+ let y=0;for(const block of blocks){paste(content,block,0,y);y+=block.height;}
+ if(content.clipped)warnings.push('Preview content clipped at selected width');
+ // Only the right-side cell padding is removed: command output does not fill terminal height.
+ const outputLines=lines(content).map(line=>line.trimEnd());
+ while(outputLines.length>1&&outputLines.at(-1)==='')outputLines.pop();
+ // Match the canvas to visible lines for colored SVG/ANSI/HTML serializers.
+ content.rows.length=outputLines.length;content.height=outputLines.length;
+ return {text:outputLines.join('\n'),lines:outputLines,cells:content,clipped:content.clipped,warnings};
 }

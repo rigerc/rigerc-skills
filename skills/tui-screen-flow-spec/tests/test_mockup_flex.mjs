@@ -28,7 +28,7 @@ function configure(out){
  const s=load(out,'scenarios');s.schema_version='1.1.0';s.variants={empty:{data:{tasks:[]}},error:{presentation:{statusType:'error',statusText:'Fixture error'}}};
  s.stateVariants={'create.edit':{error:{state:{draft_title:'Bad title'},components:{'error-status':{text:'Failure'}}}}};save(out,'scenarios',s);
 }
-test('v1.4 compatibility: unchanged default snapshot bytes for bundled task tracker',t=>{
+test('committed example snapshots match the current default renderer',t=>{
  const {dir,out}=project(t);generateMockups({repoRoot:dir,feature:'example-task-tracker'});
  for(const state of ['create.edit','create.invalid','list.ready','detail.ready']){
   const expected=fs.readFileSync(path.join(root,'examples/example-task-tracker/mockups',state+'.txt'),'utf8');
@@ -67,6 +67,29 @@ test('horizontal rendering and nested borders place components on the same row',
  assert.equal(modern.lines.some(line=>line.includes('LEFT')&&line.includes('RIGHT')),true);
  assert.ok(modern.lines.some(line=>line.includes('╭')));
  assert.equal(modern.lines[0].length,60);assert.equal(modern.lines.at(-1).length,60);
+});
+test('help footer is horizontal, bottom-aligned, and consistent in both renderers',()=>{
+ const screen={id:'sample',title:'Tasks',min_size:{cols:20,rows:8},regions:[{id:'intro',kind:'text',label:'Tasks'}],keybindings:[
+  {key:'enter',event:'task.open'},{key:'n',event:'task.create.start'},{key:'q',event:'app.exit'}
+ ]};
+ const state={id:'list.ready',terminal:false};
+ for(const render of [renderSnapshot,renderFlexibleSnapshot]){
+  const standard=render(screen,state,{}, {cols:80,rows:16});
+  assert.ok(standard.lines.at(-2).includes('enter → task.open'));
+  assert.ok(standard.lines.at(-2).includes('n → task.create.start'));
+  assert.ok(standard.lines.at(-2).includes('q → app.exit'));
+  assert.equal(standard.lines.slice(2,-2).some(line=>line.includes('→')),false);
+  assert.equal(standard.clipped,false);
+  const compact=render(screen,state,{}, {cols:40,rows:12});
+  assert.ok(compact.lines.slice(-4,-1).some(line=>line.includes('enter → task.open')));
+  assert.ok(compact.lines.slice(-4,-1).some(line=>line.includes('q → app.exit')));
+  assert.equal(compact.lines.some(line=>line.length!==40),false);
+  assert.equal(compact.clipped,false);
+  const tight=render({...screen,keybindings:[{key:'really-long-shortcut',event:'extraordinarily.long.command.name'}]},state,{}, {cols:20,rows:8});
+  assert.ok(tight.clipped);
+  assert.ok(tight.warnings.some(w=>w.includes('clipped')));
+  assert.equal(tight.lines.at(-1),'└'+'─'.repeat(18)+'┘');
+ }
 });
 test('built-in adapters and registry render unknown custom components without app runtime',()=>{
  const screen={id:'sample',title:'Forms',min_size:{cols:30,rows:10},regions:[{id:'root',kind:'container',orientation:'vertical',children:[

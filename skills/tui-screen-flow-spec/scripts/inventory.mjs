@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Read-only, heuristic code inventory for existing TUI apps. NOT a contract extractor. */
+/** Read-only, heuristic code inventory for existing fullscreen TUIs and inline CLIs. NOT a contract extractor. */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -8,9 +8,11 @@ const BLOCKED=new Set(['.git','.agents','.svn','node_modules','vendor','dist','b
 const CODE=new Set(['.go','.rs','.py','.ts','.tsx','.js','.jsx','.mjs','.cjs','.rb','.c','.h','.cpp','.hpp','.swift','.kt','.java','.zig','.cs','.lua']);
 const TEST_PATH=/(^|\/)(tests?|__tests__|spec|e2e|fixtures)\/|\.(test|spec)\.[a-z]+$|_test\.[a-z]+$|(^|\/)test_[^/]+$/i;
 // Per-signal score weight and cap: one noisy generic keyword (state, update, view...) must not outrank a real TUI framework import.
-const WEIGHT={frameworks:[5,25],input:[3,15],navigation:[3,12],rendering:[1,2],state:[1,2],effects:[1,2],validation:[1,2]};
+const WEIGHT={frameworks:[5,25],cli:[4,16],input:[3,15],navigation:[3,12],rendering:[1,2],state:[1,2],effects:[1,2],validation:[1,2]};
 const SIGNALS={
   frameworks:/\b(ratatui|crossterm|textual|prompt_toolkit|bubbletea|lipgloss|bubbles|tview|tcell|termbox|termion|ncurses|curses|blessed|urwid|asciimatics|npyscreen|cursive|ftxui|notcurses|gocui|termui|tuirealm|tui-realm|tui-rs)\b|(?:from|require)\s*\(?['"]ink['"]|@shopify\/ink|(?:from|import)\s+rich\b/i,
+  // CLI parsers and command registries: source leads, not evidence of flags or behavior.
+  cli:/\b(argparse|optparse|typer|questionary|inquirer|enquirer|oclif|commander|yargs|picocli|cobra|urfave\/cli|clap|System\.CommandLine|OptionParser|ArgumentParser|parse_args|parseArgs|parse_argv)\b|\b(?:new Command|@app\.command|@click\.command|@click\.option|cobra\.Command|clap::Parser|derive\(Parser\))\b/i,
   rendering:/\b(render|draw|layout|view|widget|screen|frame|component|viewport)\b/i,
   input:/\b(keydown|keypress|on_key|onkey|keybindings?|key_bindings?|hotkeys?|focus|keyboard|keypressmsg|keyevent|getch|get_wch|getkey|readkey|keymap)\b/i,
   navigation:/\b(navigate|router|routing|transition|go_back|backstack|screen_id)\b/i,

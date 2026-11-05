@@ -42,7 +42,7 @@ test('mockup generator renders all states, transitions, SVG/TXT files, and offli
  assert.match(invalid,/Title is required/);assert.match(saving,/disabled/);assert.match(saving,/Saving task/);
  assert.match(saving,/\[ Cancel \]/);assert.doesNotMatch(saving,/\( Cancel \)/);
  const svg=fs.readFileSync(path.join(out,'mockups/create.invalid.svg'),'utf8');assert.match(svg,/^<svg /);assert.match(svg,/Title is required/);
- const html=fs.readFileSync(result.html,'utf8');assert.match(html,/Screen-flow storyboard/);assert.match(html,/data-transition="start-create"/);
+ const html=fs.readFileSync(result.html,'utf8');assert.match(html,/Terminal interaction storyboard/);assert.match(html,/data-transition="start-create"/);
  assert.match(html,/data-state="exit.done"/);assert.match(html,/const MODEL=/);
  assert.equal(result.mapping_warnings.length,0);
  const again=generateMockups({repoRoot:dir,feature:'example-task-tracker',cols:80,rows:24,theme:'ocean'});

@@ -12,3 +12,5 @@ Use the `tui-screen-flow-spec` skill for this feature: **[INSERT FEATURE BRIEF]*
 8. Report actual generated files, decisions and validation result; do not claim that any TUI application was implemented.
 
 All generated files MUST be inside `<repo-root>/docs/plans/generated/tui/<slug>/`.
+
+For **inline CLI** requests, read `references/inline-cli.md`. Specify `screen.presentation="inline"`, `screen.cli` interaction/stdin metadata, command/prompt/stdout/stderr/progress nodes, and terminal `exit_code`; never apply a fullscreen frame or anchored help footer. Clarify argument grammar, pipe/TTY behavior and signals before final approval. Keep default fullscreen behavior for existing TUI designs.

@@ -2,7 +2,7 @@
 
 ## Principle
 
-**Show the user a provisional initial plan before interviewing them.** For a new TUI, derive v0 from the supplied brief. For an existing TUI, **inspect code and tests first**, then show an evidence-grounded extraction/reconstruction plan. Plans are conversation drafts, **not generated spec/contract files**. Mark proposed behavior, assumptions, and open choices explicitly. The user should be able to criticize the structure of the plan, not only answer an intake questionnaire.
+**Show the user a provisional initial plan before interviewing them.** For a new terminal UI (fullscreen TUI or inline CLI), derive v0 from the supplied brief. For an existing TUI, **inspect code and tests first**, then show an evidence-grounded extraction/reconstruction plan. Plans are conversation drafts, **not generated spec/contract files**. Mark proposed behavior, assumptions, and open choices explicitly. The user should be able to criticize the structure of the plan, not only answer an intake questionnaire.
 
 A first plan is a starting hypothesis, **not approval**. Interview in rounds, incorporate feedback, show the revised plan and change summary, and request explicit sign-off only once material blockers are resolved or delegated. Do not create or scaffold deliverables before that sign-off. Prefer the host's native structured-question/AskTool when available; otherwise ask concise questions in chat. Never fabricate question-tool calls.
 
@@ -49,6 +49,8 @@ The interview may take one round when a brief is complete or several when import
 | Validation | Required fields, allowed values, duplicate policy? | explicit domain rule choices |
 | Roles/safety | Authorization, sensitive data, destructive actions? | roles; confirm / deny / log |
 | Completion | Acceptance behavior and important failure scenarios? | product-specific expected outcomes |
+
+For **inline CLIs**, additionally establish invocation/flag syntax, output channel separation (stdout vs stderr), machine-readable modes, redirected streams, TTY detection, noninteractive fallback, exit codes, Ctrl+C/EOF and progress/spinner cleanup. See [inline CLI guidance](inline-cli.md). These are material contract decisions, not visual styling.
 
 ## Decision record
 

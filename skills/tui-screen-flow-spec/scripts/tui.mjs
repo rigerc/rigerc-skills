@@ -13,7 +13,7 @@ let argv = { _: [] };
 let command = 'help';
 const sourceTemplates = path.join(skillRoot, 'assets', 'templates');
 const OUTPUTS = ['CONTRACTS.md', 'DECISIONS.md', 'EVIDENCE.md', 'FLOWS.md', 'SPEC.md'];
-const commandText = () => `Usage: node scripts/tui.mjs <command> [options]\n\nCommands:\n  install    --repo-root PATH [--force] [--minimal]  Install skill + .agents/prompts (--minimal omits examples/ and tests/)\n  inventory  --repo-root PATH [--limit N]     Read-only source discovery hints for existing apps\n  scaffold   --repo-root PATH --feature SLUG [--mode greenfield|existing|existing-full] [--title TITLE] [--brief TEXT]\n  validate   --repo-root PATH --feature SLUG   Validate JSON references and write a report\n  visualize  --repo-root PATH --feature SLUG   Generate standalone interactive HTML\n  termcn-import --repo-root PATH --feature SLUG [--registry PATH|https://termcn.dev/r/registry.json] [--components ink/text-input,...]\n  mockup     --repo-root PATH --feature SLUG [--cols N --rows N --viewport NAME[,NAME] --scenario NAME[,NAME] --outputs txt,svg,ansi,html --theme dark]\n  build      --repo-root PATH --feature SLUG   Validate and generate interactive HTML\n  build      --repo-root PATH --all            Validate/render all features\n  watch      --repo-root PATH --all            Rebuild when source contracts change\n  demo       --repo-root PATH [--force]       Copy bundled examples into output path\n  test                                        Run Python and Node regression tests\n\nFlags: --strict fails build if validation fails; --output NAME sets HTML filename; --force allows overwrites for install/demo.\nNo application code is executed by validation, HTML generation, scaffold, or watch.\n`;
+const commandText = () => `Usage: node scripts/tui.mjs <command> [options]\n\nCommands:\n  install    --repo-root PATH [--force] [--minimal]  Install skill + .agents/prompts (--minimal omits examples/ and tests/)\n  inventory  --repo-root PATH [--limit N]     Read-only source discovery hints for existing apps\n  scaffold   --repo-root PATH --feature SLUG [--mode greenfield|existing|existing-full] [--surface fullscreen|inline] [--title TITLE] [--brief TEXT]\n  validate   --repo-root PATH --feature SLUG   Validate JSON references and write a report\n  visualize  --repo-root PATH --feature SLUG   Generate standalone interactive HTML\n  termcn-import --repo-root PATH --feature SLUG [--registry PATH|https://termcn.dev/r/registry.json] [--components ink/text-input,...]\n  mockup     --repo-root PATH --feature SLUG [--cols N --rows N --viewport NAME[,NAME] --scenario NAME[,NAME] --outputs txt,svg,ansi,html --theme dark]\n  build      --repo-root PATH --feature SLUG   Validate and generate interactive HTML\n  build      --repo-root PATH --all            Validate/render all features\n  watch      --repo-root PATH --all            Rebuild when source contracts change\n  demo       --repo-root PATH [--force]       Copy bundled examples into output path\n  test                                        Run Python and Node regression tests\n\nFlags: --strict fails build if validation fails; --output NAME sets HTML filename; --force allows overwrites for install/demo.\nNo application code is executed by validation, HTML generation, scaffold, or watch.\n`;
 function assertDestinationSafe(destination, root) {
   const resolvedRoot = path.resolve(root);
   let cursor = path.resolve(destination);
@@ -57,6 +57,9 @@ function writeJSON(location,data){fs.writeFileSync(location,JSON.stringify(data,
 function scaffold(root){
   const feature=requireFeature(argv.feature);
   const mode=argv.mode||'greenfield';
+  const surface=argv.surface||'fullscreen';
+  if(!['fullscreen','inline'].includes(surface))throw new Error('Unknown presentation surface: '+surface);
+  if(mode==='existing'&&surface==='inline')throw new Error('Inline scaffold requires full scope (greenfield or existing-full)');
   if(!['greenfield','existing','existing-full'].includes(mode))throw new Error('Unknown scaffold mode: '+mode);
   const dir=featureDir(root,feature);
   if(fs.existsSync(dir))throw new Error('Feature folder already exists; refusing to overwrite: '+dir);
@@ -83,9 +86,17 @@ function scaffold(root){
   if(full){
     const screens=JSON.parse(fs.readFileSync(path.join(dir,'screens.json'),'utf8'));
     screens.screens[0].id=manifest.entry_screen;screens.screens[0].title=manifest.title;screens.screens[0].states=[feature+'.initial'];
+    if(surface==='inline'){
+      const screen=screens.screens[0];
+      screen.presentation='inline';
+      screen.cli={invocation:feature,interaction:'batch',stdin:'none'};
+      screen.min_size={cols:40,rows:1};
+      screen.regions[0].children=[{id:'invocation',kind:'command'},{id:'output',kind:'output',stream:'stdout'}];
+    }
     writeJSON(path.join(dir,'screens.json'),screens);
     const machine=JSON.parse(fs.readFileSync(path.join(dir,'machine.json'),'utf8'));
     machine.initial=feature+'.initial';machine.states[0].id=machine.initial;machine.states[0].screen=manifest.entry_screen;
+    if(surface==='inline')machine.states[0].exit_code=0;
     writeJSON(path.join(dir,'machine.json'),machine);
   }
   console.log('Scaffolded draft (not a complete specification): '+dir);
@@ -132,7 +143,7 @@ function runBuild(root,feature,strict){
 }
 function copyExample(root) {
   if(!fs.existsSync(path.join(skillRoot,'examples')))throw new Error('Bundled examples are not available (skill was installed with --minimal).');
-  for(const feature of ['example-task-tracker','example-existing-app']){
+  for(const feature of ['example-task-tracker','example-existing-app','example-inline-cli']){
     const dst=featureDir(root,feature),src=path.join(skillRoot,'examples',feature);
     if(fs.existsSync(dst)&&!argv.force)throw new Error('Example already exists: '+dst+'; --force to overwrite');
     copyDir(src,dst,!!argv.force,new Set(),root);
@@ -162,7 +173,7 @@ async function main(){
   if(command==='test'){
     const results=[];
     results.push(spawnSync(process.env.PYTHON||'python3',['-m','unittest','discover','-s',path.join(skillRoot,'tests'),'-p','test_*.py','-v'],{stdio:'inherit'}));
-    results.push(spawnSync(process.execPath,['--test',path.join(skillRoot,'tests','test_tools.mjs'),path.join(skillRoot,'tests','test_termcn_mockups.mjs'),path.join(skillRoot,'tests','test_mockup_flex.mjs')],{stdio:'inherit'}));
+    results.push(spawnSync(process.execPath,['--test',path.join(skillRoot,'tests','test_tools.mjs'),path.join(skillRoot,'tests','test_termcn_mockups.mjs'),path.join(skillRoot,'tests','test_mockup_flex.mjs'),path.join(skillRoot,'tests','test_inline_cli.mjs')],{stdio:'inherit'}));
     if(results.some(r=>r.status!==0))process.exitCode=1;
     return;
   }

@@ -1,3 +1,21 @@
+# Changelog
+
+## 1.6.0
+
+Inline CLI surface support (additive / backward compatible)
+- Added `screens[*].presentation: "inline"` and required inline `cli` metadata (`invocation`, `interaction`, `stdin`) without changing canonical schema version 1.0.0; legacy screens still default to fullscreen.
+- Added inline semantic nodes for command echoes, stdout/stderr output, prompts, spinner, and progress; multiline fixture output and channel-specific preview colors.
+- Inline renderer produces unframed scrollback-sized snapshots and preserves terminal-state output rather than a generic fullscreen terminal message. Content is never cut to terminal row count; no pinned keyboard-help footer.
+- Terminal inline states require `exit_code` 0–255 in machine.json. New checks reject invalid CLI modes, prompt/stream use, missing exit codes and CLI props on fullscreen views.
+- Added `scaffold --surface inline`, a tested `example-inline-cli` with prompt + batch modes and stdout/stderr + exit-code outcomes, guidance for CLI I/O and terminal semantics, and regression tests.
+- No target CLI execution; snapshots remain semantic documentation, not runtime simulation. Existing TUI semantics and renderers are preserved.
+
+## 1.5.1 — horizontal keyboard help footer
+
+- Render keyboard shortcuts side by side in a bottom-anchored help footer instead of a vertical list, in both legacy and flexible terminal mockups.
+- Wrap shortcuts between entries when the viewport is narrow, and report clipping if a single shortcut cannot fit.
+- Regenerate bundled task-tracker previews and add regression coverage for footer placement, wrapping, and narrow terminals.
+
 ## 1.5.0 — configurable mockup layouts, scenario matrices and output adapters
 
 - Added a terminal-cell layout engine for nested horizontal/vertical/grid/overlay containers, configurable spacing, padding, borders, widths, alignment, wrapping and clipping warnings. Existing designs without new layout/style overrides retain the v1.4 text renderer and unchanged default TXT bytes.

@@ -68,3 +68,7 @@ The validator checks contract internal references, claim coverage, source existe
 ## Type strings (recommended vocabulary)
 
 Payload, prop, field and input types are free-form strings, but contracts are portable between agents when they share one vocabulary: scalars `string`, `int`, `number`, `bool`, `timestamp`; collections `T[]` and `map<string,T>`; optional `T?`; enumerations `enum(a|b|c)`; references to a declared model by its exact name. The validator does not enforce this vocabulary.
+
+## Inline CLI-specific contracts
+
+For inline CLI views, use `screens[*].presentation="inline"` and `screens[*].cli` for invocation, input/interaction mode; use `machine.states[*].exit_code` for terminal outcomes. Document option/argument parsing, stdin/TTY behavior, stdout vs stderr boundaries, shell exit status, structured output modes, redirection, Ctrl+C and EOF, and transient progress in human-readable spec and contract descriptions. See [inline CLI guidance](inline-cli.md). The preview is not a process emulator.
