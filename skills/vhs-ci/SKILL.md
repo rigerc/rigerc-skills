@@ -1,11 +1,11 @@
 ---
 name: vhs-ci
-description: Add a GitHub Actions workflow to a CLI or TUI repository that records reproducible terminal demos with Charmbracelet VHS, producing PNG screenshots, GIFs, and MP4 videos, checking outputs, and uploading CI artifacts. Use for CLI demo automation, PR visual evidence, and screenshot/video workflows.
+description: Add VHS recording CI to a CLI or TUI project with GitHub Actions. Use when asked to automate terminal screenshots, GIFs or MP4 demos on pushes or pull requests, produce downloadable CLI recording artifacts, or set up vhs-action workflows.
 ---
 
 # VHS CI
 
-Install a recording workflow in the **target CLI repository**. This skill complements the sibling **vhs-cli** skill; read its SKILL.md and references/ci-integration.md when available. Tape preflight, actual rendering, and human visual review are distinct states. A successful CI run does not prove visual correctness.
+Install a recording workflow in the **target CLI repository**. Read the sibling **vhs-cli** SKILL.md and references/ci-integration.md first when available; reuse its tape-writing guidance rather than duplicating it here. Tape preflight, actual rendering, and human visual review are distinct states. A successful CI run does not prove visual correctness.
 
 ## Inspect the project first
 
@@ -35,7 +35,7 @@ Generated target-repository files:
 - demos/vhs/demo.tape: GIF, MP4, a named PNG Screenshot, Require, Wait+Screen and post-screenshot settling delay.
 - demos/vhs/.gitignore: excludes the generated outputs/ directory from commits.
 
-The underlying templates are assets/vhs.yml and assets/demo.tape. For an existing workflow or a more complex TUI, adapt them manually instead of overwriting project configuration.
+Templates live in assets/vhs.yml and assets/demo.tape. If the target already has a VHS workflow, extend it rather than installing a competing workflow.
 
 ## Verification contract
 
@@ -58,11 +58,5 @@ test -s outputs/screens/01-demo.png
 ## Adaptation and safety
 
 For TUIs, use state-specific Wait+Screen patterns, keyboard navigation and multiple named screenshots. Add corresponding output verification for every artifact. For multiple tapes, isolate output paths to prevent collisions. VHS outputs resolve from the working directory where VHS runs; keep the workflow's cd demos/vhs. The VHS action only installs the recording tool; the target CLI must be built separately. Prefer GitHub artifact uploads, read-only contents permissions and Git-ignored output; do not auto-commit generated binaries or enable privileged production operations.
-
-Run installer tests without VHS:
-
-~~~sh
-python3 -m unittest discover -s skills/vhs-ci/tests -v
-~~~
 
 References: https://github.com/charmbracelet/vhs and https://github.com/charmbracelet/vhs-action

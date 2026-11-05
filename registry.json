@@ -129,13 +129,6 @@
       "content_sha256": "4c3426a9f09ee0d4f0cd031f5bf195fa4a87aa4785f39393b1a4c17cb4206cad"
     },
     {
-      "id": "rigerc/rigerc-skills/skills/vhs-ci",
-      "name": "vhs-ci",
-      "description": "Add a GitHub Actions workflow to a CLI or TUI repository that records reproducible terminal demos with Charmbracelet VHS, producing PNG screenshots, GIFs, and MP4 videos, checking outputs, and uploading CI artifacts. Use for CLI demo automation, PR visual evidence, and screenshot/video workflows.",
-      "path": "skills/vhs-ci",
-      "content_sha256": "e542d2df4f8d3ed6fa72d8afb6786ea94035a23db1585de0f8321362392704e2"
-    },
-    {
       "id": "rigerc/rigerc-skills/skills/vhs-cli",
       "name": "vhs-cli",
       "description": "Create and verify reproducible terminal recordings using Charmbracelet VHS. Use for .tape authoring, CLI/TUI demos, GIF/MP4/WebM recording, terminal screenshots, and ASCII golden fixtures. Offers simple (lint without rendering) and expanded (render, inspect, review) workflows.",
@@ -466,7 +459,6 @@
       ],
       "skill_ids": [
         "rigerc/rigerc-skills/skills/tui-vhs-audit",
-        "rigerc/rigerc-skills/skills/vhs-ci",
         "rigerc/rigerc-skills/skills/vhs-cli"
       ]
     }
