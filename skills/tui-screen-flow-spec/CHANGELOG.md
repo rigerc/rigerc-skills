@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.0 — structured intake and Go framework guidance
+
+- Ask a small set of structured material questions at the beginning, **before** presenting provisional v0. Existing-app workflows still inspect code/tests first; only unresolved gaps are queried. Use native structured-question controls where available, otherwise offer numbered choices with Other/unsure.
+- Continue with visible plan revisions and explicit approval before writing, preserving the existing blocker and provenance gates.
+- Document Bubble Tea v1/v2 and TUIWeave (Bubble Tea v2 component library) adaptation to canonical UI/state/event/command contracts, with explicit version checking and runtime/mockup boundaries.
+- Recognize TUIWeave in the read-only inventory and add regression coverage for Go framework signals and question-first prompts. No Go application execution or new Go dependency; canonical schemas remain unchanged.
+
 ## 1.6.0
 
 Inline CLI surface support (additive / backward compatible)

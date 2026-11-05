@@ -1,6 +1,6 @@
 {
   "name": "tui-screen-flow-spec",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "private": true,
   "type": "module",
   "description": "Agent Skill for fullscreen TUIs and inline CLI flows, contracts and semantic terminal previews",

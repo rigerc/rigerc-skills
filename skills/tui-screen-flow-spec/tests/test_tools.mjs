@@ -49,29 +49,35 @@ test('portable skill root follows metadata and packaging conventions',()=>{
   assert.equal(path.basename(skillRoot),'tui-screen-flow-spec');
   const skill=fs.readFileSync(path.join(skillRoot,'SKILL.md'),'utf8');
   assert.match(skill,/^---\nname: tui-screen-flow-spec/m);
-  assert.match(skill,/version: "1\.6\.0"/);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(skillRoot,'package.json'),'utf8')).version,'1.7.0');
+  assert.match(skill,/TUIWeave/);
   assert.ok(fs.existsSync(path.join(skillRoot,'README.md')));
   assert.equal(fs.readdirSync(path.join(skillRoot,'.agents','prompts')).length,6);
 });
-test('skill and prompts enforce a plan-first iterative interview before artifact generation',()=>{
+test('skill and prompts ask structured questions before v0 and require approval before writing',()=>{
   const read=(rel)=>fs.readFileSync(path.join(skillRoot,rel),'utf8');
   const skill=read('SKILL.md');
-  const v0=skill.indexOf('Present initial plan (v0) before interviewing');
+  const intake=skill.indexOf('Read the brief and ask structured intake questions first');
+  const v0=skill.indexOf('Present provisional plan (v0) after initial answers');
   const interview=skill.indexOf('Interview and iteratively revise');
   const approval=skill.indexOf('Get plan sign-off');
   const writing=skill.indexOf('Write one feature folder');
-  assert.ok(v0>=0&&v0<interview&&interview<approval&&approval<writing);
+  assert.ok(intake>=0&&intake<v0&&v0<interview&&interview<approval&&approval<writing);
   const elicitation=read('references/elicitation.md');
-  assert.match(elicitation,/Show the user a provisional initial plan before interviewing/);
-  assert.match(elicitation,/after each user response/i);
+  assert.match(elicitation,/Ask structured, high-impact questions at the beginning, then propose the first plan/);
+  assert.match(elicitation,/After (?:subsequent|each) (?:user )?response/i);
   assert.match(elicitation,/explicit sign-off/);
+  assert.match(read('references/go-frameworks.md'),/Bubble Tea v1 and v2/);
+  assert.match(read('references/go-frameworks.md'),/TUIWeave on Bubble Tea v2/);
   const decisions=read('assets/templates/DECISIONS.template.md');
-  assert.match(decisions,/Plan review and approval/);
+  assert.match(decisions,/structured initial intake/i);
   assert.match(decisions,/Final approved version/);
   for(const prompt of ['tui-clarify.md','tui-design.md','tui-extract-contracts.md','tui-reconstruct-flows.md','tui-update-contracts.md']){
     const body=read(`.agents/prompts/${prompt}`);
-    assert.match(body,/(?:initial|provisional).*plan.*(?:v0|before)/is,prompt);
-    assert.match(body,/(?:after each|after every).*?(?:reply|response|answer)/is,prompt);
+    const question=body.search(/structured/i);
+    const v0Index=body.indexOf('v0');
+    assert.ok(question>=0&&v0Index>question,`${prompt}: structured questions must precede v0`);
+    assert.match(body,/after (?:my )?(?:initial|subsequent|later).*?answer|after (?:my )?(?:subsequent|later) repl/i,prompt);
     assert.match(body,/explicit approval|approve|approval/);
   }
 });
@@ -165,6 +171,20 @@ test('read-only inventory detects source candidates without creating files',()=>
     assert.ok(scan.candidates.some(c=>c.path==='my_tui.py'&&c.signals.input));
     assert.equal(scan.scanned_files,1);
     assert.equal(fs.readdirSync(root).filter(x=>x==='inventory.json').length,0);
+  }finally{fs.rmSync(root,{recursive:true,force:true});}
+});
+
+test('inventory identifies Bubble Tea v1/v2 and TUIWeave Go source as discovery leads',()=>{
+  const root=tmpRepo();
+  try{
+    fs.writeFileSync(path.join(root,'bt-v1.go'),'package main\nimport tea "github.com/charmbracelet/bubbletea"\nvar _ tea.Model\n');
+    fs.writeFileSync(path.join(root,'bt-v2.go'),'package main\nimport tea "github.com/charmbracelet/bubbletea/v2"\nvar _ tea.Msg\n');
+    fs.writeFileSync(path.join(root,'tuiweave.go'),'package main\nimport "github.com/ishan5ain/tuiweave/layout"\n');
+    const scan=inventory(root);
+    for(const file of ['bt-v1.go','bt-v2.go','tuiweave.go']){
+      assert.ok(scan.candidates.some(c=>c.path===file && c.signals.frameworks),file);
+    }
+    assert.match(scan.warning,/not proof of implemented behavior/);
   }finally{fs.rmSync(root,{recursive:true,force:true});}
 });
 

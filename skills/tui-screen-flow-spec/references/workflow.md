@@ -4,8 +4,8 @@
 
 Decide whether each view is fullscreen or inline before designing layout. Inline views use `presentation: "inline"`, `cli` metadata, scrolling output/prompt nodes and terminal exit codes. See [inline CLI workflow](inline-cli.md).
 
-1. Read the brief and present an **initial provisional plan (v0)** in conversation: scope, likely screens and flows, constraints, assumptions and alternatives. **Do this before asking the user design questions.** Follow the interview protocol in [elicitation.md](elicitation.md).
-2. Interview the user in focused rounds. After each reply, incorporate decisions into a visible **revised plan (v1, v2, …)**, briefly explain the delta, and ask the next material questions. Keep iterating until blockers are answered, delegated or removed from scope.
+1. Read the brief and **start with a short structured intake** for missing material choices (surface, task, framework/version, interaction and constraints). Offer specific answer options and an Other path; skip information already supplied. Follow [elicitation.md](elicitation.md).
+2. After the initial answers, show a **provisional plan (v0)** covering scope, likely screens/flows, assumptions and alternatives. Continue with focused follow-ups; after each subsequent response show a **revised plan (v1, v2, …)**, explain the delta and resolve/delegate/exclude blockers.
 3. Present the consolidated plan and request **explicit approval to generate**. If changes are requested, revise and interview again. Record the approved plan version, user sign-off and prior rounds in `DECISIONS.md` once writing begins. Do not scaffold or write generated artifacts before approval.
 4. Derive the repo root using `git rev-parse --show-toplevel` (preferred), or have the user specify the root. Example: `ROOT=$(git rev-parse --show-toplevel)`. The root must be known before writing, but a provisional plan can be discussed earlier.
 5. Select a feature slug: `[a-z0-9]+(-[a-z0-9]+)*`. **Only after approval and question closure**, optionally run `node <skill-root>/scripts/tui.mjs scaffold --repo-root "$ROOT" --feature "$SLUG" --mode greenfield` to prepare a draft in the required feature directory.
@@ -18,7 +18,7 @@ Decide whether each view is fullscreen or inline before designing layout. Inline
 ## Update an existing feature
 
 - Read `manifest.json`, canonical JSON and `DECISIONS.md` before proposing changes; inspect evidence where present.
-- **Present an initial change plan/delta in chat**, including what screens/contracts and stable IDs would change and what might break. Do not edit files yet.
+- **Ask structured questions first** if the change's scope or material trade-offs are unclear; then present a provisional change plan/delta in chat, including affected screens/contracts, stable IDs and potential breakage. Do not edit files yet.
 - Interview the user about newly material unknowns and choices; revise the change plan after each response, and get **explicit approval** of the final scope before editing. Do not repeat already-settled questions unless the requirements have changed.
 - Keep stable IDs for unchanged semantics. Treat removed nodes, events, or states as breaking contract changes; document in `DECISIONS.md` along with plan versions and approval.
 - Update `SPEC.md`, `FLOWS.md`, `CONTRACTS.md`, and machine-readable files as a single change; rerun the validator and regenerate the HTML viewer.
@@ -35,9 +35,9 @@ Decide whether each view is fullscreen or inline before designing layout. Inline
 
 ## Document contracts for an existing application
 
-1. Follow [existing-app.md](existing-app.md) for read-only source inspection, evidence inventory and the plan-first interview. Show v0 **after source inspection**, using observed facts rather than inventing behavior.
+1. Follow [existing-app.md](existing-app.md) for read-only source inspection, evidence inventory and structured questions about unresolved scope **before v0**. Show the evidence-grounded plan after intake answers, without inventing behavior.
 2. Set `manifest.source_mode` to `existing-app` and `manifest.artifact_scope` to `contracts-only` (default) or `full` (if screens and complete flows are requested). Set a stable feature slug for the existing surface.
-3. Ask questions and **revise the extraction plan in visible rounds**. Obtain user approval of the consolidated scope; only then create `docs/plans/generated/tui/<feature>/`. Do not modify app code or run untrusted code without permission.
+3. After the opening intake, **revise the extraction plan in visible rounds** as new answers arrive. Obtain approval of the consolidated scope; only then create `docs/plans/generated/tui/<feature>/`. Do not modify app code or run untrusted code without permission.
 4. Start with `assets/templates/manifest.existing-app.template.json` and `assets/templates/evidence.template.json`. Fill `contracts.json` from observed application behavior. Produce `EVIDENCE.md` with the inventory, evidence mapping, limitations, and known gaps. Record plan changes, decisions and approval in `DECISIONS.md`.
 5. For contracts-only, omit screen tree and machine files entirely; use `CONTRACTS.md`, `DECISIONS.md`, `EVIDENCE.md`, `manifest.json`, `contracts.json`, `evidence.json`, `validation-report.json`, and `contracts-viewer.html`. For full reconstruction, include the same screen/flow artifacts as greenfield and both evidence files.
 6. Every top-level contract entity must appear in `evidence.json` claims with exact `ref` and source locations. If a contract is only inferred, identify its uncertainty and keep the manifest in `draft`.
