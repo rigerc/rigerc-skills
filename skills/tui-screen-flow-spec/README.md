@@ -2,7 +2,7 @@
 
 A **standalone, framework-agnostic Agent Skills package** that produces view specifications, state machines, and typed contracts for **fullscreen TUIs and inline, non-fullscreen CLIs** in both new and existing terminal applications. It includes a **dependency-free Node.js HTML generator** for exploring contracts offline, a Python validator, reusable templates and JSON Schemas, agent workflow prompts, and runnable examples.
 
-No application code is generated or executed. Existing fullscreen definitions remain compatible: omitting `presentation` still means `fullscreen`. Optional termcn-backed props schemas and screen/state mockups can now be generated without executing the target application. The agent **presents a provisional plan first, interviews the user, visibly revises the plan, and gets approval** before authoring contracts; the scripts automate preparation, validation, visualization, and packaging tasks.
+No application code is generated or executed. Existing fullscreen definitions remain compatible: omitting `presentation` still means `fullscreen`. Optional termcn-backed props schemas and screen/state mockups can now be generated without executing the target application. The agent **asks structured, material questions first, presents a provisional plan based on the answers, iterates it, and gets explicit approval** before authoring contracts; the scripts automate preparation, validation, visualization, and packaging tasks.
 
 ## Requirements
 
@@ -39,6 +39,14 @@ tui-screen-flow-spec/
 ├── examples/                    # Complete full + contracts-only examples
 └── tests/                       # Python + Node regression tests
 ```
+
+## Bubble Tea and TUIWeave support (1.7.0)
+
+The skill supports **Bubble Tea v1/v2** applications and **TUIWeave**, a composable component library built on **Bubble Tea v2**. This is specification, existing-code inspection and contract mapping support, **not Go application generation**. Read [Go framework guidance](references/go-frameworks.md) to map model/update/view, messages, commands, focus and component boundaries into framework-neutral screen/state/event/command contracts. The read-only inventory detects Bubble Tea and TUIWeave imports as leads, not verified behavior.
+
+At the beginning of a design session, the agent asks a small, structured set of questions with options and an Other path: terminal surface (fullscreen/inline/hybrid), framework/version (agnostic / Bubble Tea v1/v2 / Bubble Tea v2 + TUIWeave), primary task, input constraints, and IO/data needs **only if unresolved**. For existing apps, source inspection precedes these gap questions. After initial answers, the agent shows provisional v0, revises it in subsequent rounds and requests explicit approval before generating files.
+
+TUIWeave does not own application state, routing or side effects. The optional termcn importer remains **Ink/OpenTUI-only**, and generated semantic mockups/storyboards are not faithful Bubble Tea or TUIWeave runtime renders.
 
 ## Inline CLI, not just fullscreen TUI (1.6.0)
 
@@ -177,13 +185,13 @@ Agent products vary in skill and prompt discovery. If `.agents/skills/` or `.age
 
 **New TUI:**
 
-> Use the `tui-screen-flow-spec` skill to design a new terminal UI for [brief]. First show me a provisional screen-and-flow plan. Then interview me in focused rounds, revise the plan after each reply, and ask me to approve the final plan before generating any artifacts. Produce structured screens, a complete state machine, and UI/state/event/command/data/validation contracts. Validate and generate a standalone contract viewer.
+> Use the `tui-screen-flow-spec` skill to design a new terminal UI for [brief]. First ask structured questions about unresolved choices (including framework and terminal surface), then show me a provisional screen-and-flow plan. Interview me in focused rounds, revise it after later replies, and ask me to approve the final plan before generating any artifacts. Produce structured screens, a complete state machine, and UI/state/event/command/data/validation contracts. Validate and generate a standalone contract viewer.
 
 **Existing TUI:**
 
-> Use `tui-screen-flow-spec` to inspect this repository read-only, show an evidence-grounded extraction plan first, then interview me about remaining ambiguities. Iterate the plan after each answer, obtain my approval, and produce a contracts-only baseline with provenance. Validate and generate the interactive HTML viewer.
+> Use `tui-screen-flow-spec` to inspect this repository read-only, inspect source first, ask structured questions about unresolved gaps, then show an evidence-grounded extraction plan and iterate over remaining ambiguities. Iterate the plan after each answer, obtain my approval, and produce a contracts-only baseline with provenance. Validate and generate the interactive HTML viewer.
 
-The agent **must show v0 before asking material design questions, interview and revise in visible rounds, and obtain explicit approval before authoring**. The interview distinguishes source-backed observations from user confirmations, inferences, and proposed behavior. Scripts cannot substitute for judgment or infer business rules from a vague description. For existing code, do not execute application scripts or tests without permission.
+The agent **must ask relevant structured questions before v0, revise the plan in visible rounds after answers, and obtain explicit approval before authoring**. The interview distinguishes source-backed observations from user confirmations, inferences, and proposed behavior. Scripts cannot substitute for judgment or infer business rules from a vague description. For existing code, do not execute application scripts or tests without permission.
 
 ## Generated artifact layout
 
