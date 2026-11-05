@@ -2,7 +2,7 @@
 
 ## Plan review and approval
 
-Record **conversation** plans (not generated file drafts). Keep the initial plan and meaningful revisions; the latest version must have explicit user approval before generated artifacts are authored.
+Record the **structured initial intake** (Q-IDs, selected choices and custom answers) before the first provisional plan. Keep the conversation's v0 plan and meaningful revisions; the latest version must have explicit user approval before generated artifacts are authored.
 
 | Plan version | User feedback / decisions | What changed | Review status |
 | --- | --- | --- | --- |
