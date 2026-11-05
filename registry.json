@@ -117,9 +117,9 @@
     {
       "id": "rigerc/rigerc-skills/skills/tui-screen-flow-spec",
       "name": "tui-screen-flow-spec",
-      "description": "Design or document framework-agnostic terminal experiences fullscreen TUIs and inline (non-fullscreen) CLIs. Generate source-backed UI, state, event, command, data, and validation contracts from existing applications, or plan new TUI screens with full state-machine flows. Present a provisional plan first, interview the user in iterative rounds, obtain plan approval before generating, then validate contracts and create a standalone interactive HTML contract explorer. Store design artifacts under docs/plans/generated/tui at the repository root. Use for fullscreen TUI and inline CLI design, audits, reverse-engineering, contract extraction, and handoffs.",
+      "description": "Design or document framework-agnostic terminal experiences fullscreen TUIs and inline (non-fullscreen) CLIs. Generate source-backed UI, state, event, command, data, and validation contracts from existing applications, or plan new TUI screens with full state-machine flows. Ask structured intake questions at the start, present a provisional plan informed by answers, iterate with follow-up questions, and obtain plan approval before generating, then validate contracts and create a standalone interactive HTML contract explorer. Store design artifacts under docs/plans/generated/tui at the repository root. Use for fullscreen TUI and inline CLI design, audits, reverse-engineering, contract extraction, and handoffs.",
       "path": "skills/tui-screen-flow-spec",
-      "content_sha256": "9d3e94026cf7131b76442ff2cd922a84ef50ef351808af73b97f63f9cd90ec33"
+      "content_sha256": "f5f606d82975ed27b43c9c6430ac2f630a0efc05720671ff8a596909e69c8a86"
     },
     {
       "id": "rigerc/rigerc-skills/skills/tui-vhs-audit",
