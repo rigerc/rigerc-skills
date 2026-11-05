@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tui:scenarios:1.0.0",
+  "title": "Optional TUI mockup scenarios",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version"],
+  "properties": {
+    "schema_version": {"const":"1.0.0"},
+    "defaults": {"$ref":"#/$defs/fixture"},
+    "states": {
+      "type":"object",
+      "additionalProperties":{"$ref":"#/$defs/fixture"}
+    }
+  },
+  "$defs": {
+    "component": {
+      "type":"object",
+      "additionalProperties": false,
+      "properties": {
+        "hidden":{"type":"boolean"},
+        "disabled":{"type":"boolean"},
+        "value":{"type":["string","number","boolean","null"]},
+        "text":{"type":"string"},
+        "items":{"type":"array", "items":{}}
+      }
+    },
+    "fixture": {
+      "type":"object",
+      "additionalProperties":false,
+      "properties": {
+        "data":{"type":"object"},
+        "state":{"type":"object"},
+        "components":{"type":"object", "additionalProperties":{"$ref":"#/$defs/component"}},
+        "focus":{"type":"string"},
+        "disabled":{"type":"boolean"},
+        "status":{"type":"string"},
+        "selectedIndex":{"type":"integer", "minimum":0},
+        "suppressDefaultStatus":{"type":"boolean"}
+      }
+    }
+  }
+}

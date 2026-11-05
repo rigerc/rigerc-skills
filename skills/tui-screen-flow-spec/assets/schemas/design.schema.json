@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tui:design:1.0.0",
+  "title": "Optional TUI visual configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "componentProps": {"type":"object", "additionalProperties":{"type":"object"}},
+    "componentMappings": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[a-z][a-z0-9-]*$"},
+      "additionalProperties": {"type":"string", "pattern":"^(ink|opentui)/[a-z0-9][a-z0-9-]*$"}
+    },
+    "themes": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[a-z][a-z0-9_-]*$"},
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["bg","panel","fg","muted","accent","border","error"],
+        "properties": {
+          "bg": {"$ref":"#/$defs/color"},
+          "panel": {"$ref":"#/$defs/color"},
+          "fg": {"$ref":"#/$defs/color"},
+          "muted": {"$ref":"#/$defs/color"},
+          "accent": {"$ref":"#/$defs/color"},
+          "border": {"$ref":"#/$defs/color"},
+          "error": {"$ref":"#/$defs/color"}
+        }
+      }
+    }
+  },
+  "$defs": {"color": {"type":"string", "pattern":"^#[0-9a-fA-F]{6}$"}}
+}
