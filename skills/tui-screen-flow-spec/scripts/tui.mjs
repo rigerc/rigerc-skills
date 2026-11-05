@@ -13,7 +13,7 @@ let argv = { _: [] };
 let command = 'help';
 const sourceTemplates = path.join(skillRoot, 'assets', 'templates');
 const OUTPUTS = ['CONTRACTS.md', 'DECISIONS.md', 'EVIDENCE.md', 'FLOWS.md', 'SPEC.md'];
-const commandText = () => `Usage: node scripts/tui.mjs <command> [options]\n\nCommands:\n  install    --repo-root PATH [--force] [--minimal]  Install skill + .agents/prompts (--minimal omits examples/ and tests/)\n  inventory  --repo-root PATH [--limit N]     Read-only source discovery hints for existing apps\n  scaffold   --repo-root PATH --feature SLUG [--mode greenfield|existing|existing-full] [--title TITLE] [--brief TEXT]\n  validate   --repo-root PATH --feature SLUG   Validate JSON references and write a report\n  visualize  --repo-root PATH --feature SLUG   Generate standalone interactive HTML\n  termcn-import --repo-root PATH --feature SLUG [--registry PATH|https://termcn.dev/r/registry.json] [--components ink/text-input,...]\n  mockup     --repo-root PATH --feature SLUG [--cols 80 --rows 24 --theme dark]   Generate SVG/TXT mockups + storyboard.html\n  build      --repo-root PATH --feature SLUG   Validate and generate interactive HTML\n  build      --repo-root PATH --all            Validate/render all features\n  watch      --repo-root PATH --all            Rebuild when source contracts change\n  demo       --repo-root PATH [--force]       Copy bundled examples into output path\n  test                                        Run Python and Node regression tests\n\nFlags: --strict fails build if validation fails; --output NAME sets HTML filename; --force allows overwrites for install/demo.\nNo application code is executed by validation, HTML generation, scaffold, or watch.\n`;
+const commandText = () => `Usage: node scripts/tui.mjs <command> [options]\n\nCommands:\n  install    --repo-root PATH [--force] [--minimal]  Install skill + .agents/prompts (--minimal omits examples/ and tests/)\n  inventory  --repo-root PATH [--limit N]     Read-only source discovery hints for existing apps\n  scaffold   --repo-root PATH --feature SLUG [--mode greenfield|existing|existing-full] [--title TITLE] [--brief TEXT]\n  validate   --repo-root PATH --feature SLUG   Validate JSON references and write a report\n  visualize  --repo-root PATH --feature SLUG   Generate standalone interactive HTML\n  termcn-import --repo-root PATH --feature SLUG [--registry PATH|https://termcn.dev/r/registry.json] [--components ink/text-input,...]\n  mockup     --repo-root PATH --feature SLUG [--cols N --rows N --viewport NAME[,NAME] --scenario NAME[,NAME] --outputs txt,svg,ansi,html --theme dark]\n  build      --repo-root PATH --feature SLUG   Validate and generate interactive HTML\n  build      --repo-root PATH --all            Validate/render all features\n  watch      --repo-root PATH --all            Rebuild when source contracts change\n  demo       --repo-root PATH [--force]       Copy bundled examples into output path\n  test                                        Run Python and Node regression tests\n\nFlags: --strict fails build if validation fails; --output NAME sets HTML filename; --force allows overwrites for install/demo.\nNo application code is executed by validation, HTML generation, scaffold, or watch.\n`;
 function assertDestinationSafe(destination, root) {
   const resolvedRoot = path.resolve(root);
   let cursor = path.resolve(destination);
@@ -123,8 +123,9 @@ function runBuild(root,feature,strict){
   const output=renderViewer({repoRoot:root,feature,output:argv.output||'contracts-viewer.html'});
   console.log('  HTML: '+path.relative(root,output.path));
   if(fs.existsSync(path.join(featureDir(root,feature),'screens.json')) && fs.existsSync(path.join(featureDir(root,feature),'machine.json'))){
-    const mock=generateMockups({repoRoot:root,feature,cols:argv.cols?Number(argv.cols):80,rows:argv.rows?Number(argv.rows):24,theme:argv.theme||'dark'});
-    console.log('  STORYBOARD: '+path.relative(root,mock.html)+' ('+mock.state_count+' states)');
+    const mock=generateMockups({repoRoot:root,feature,cols:argv.cols!==undefined?Number(argv.cols):undefined,rows:argv.rows!==undefined?Number(argv.rows):undefined,viewport:argv.viewport,scenario:argv.scenario,outputs:argv.outputs,theme:argv.theme||'dark'});
+    console.log('  MOCKUPS: '+path.relative(root,mock.manifest)+' ('+mock.variant_count+' variants)');
+    if(mock.html)console.log('  STORYBOARD: '+path.relative(root,mock.html)+' ('+mock.state_count+' states)');
   }
   if(strict&&!passed)process.exitCode=1;
   return passed;
@@ -161,7 +162,7 @@ async function main(){
   if(command==='test'){
     const results=[];
     results.push(spawnSync(process.env.PYTHON||'python3',['-m','unittest','discover','-s',path.join(skillRoot,'tests'),'-p','test_*.py','-v'],{stdio:'inherit'}));
-    results.push(spawnSync(process.execPath,['--test',path.join(skillRoot,'tests','test_tools.mjs'),path.join(skillRoot,'tests','test_termcn_mockups.mjs')],{stdio:'inherit'}));
+    results.push(spawnSync(process.execPath,['--test',path.join(skillRoot,'tests','test_tools.mjs'),path.join(skillRoot,'tests','test_termcn_mockups.mjs'),path.join(skillRoot,'tests','test_mockup_flex.mjs')],{stdio:'inherit'}));
     if(results.some(r=>r.status!==0))process.exitCode=1;
     return;
   }
@@ -175,7 +176,7 @@ async function main(){
   if(command==='termcn-import'){
     await awaitTermcnImport(root,fspec());return;
   }
-  if(command==='mockup'){const r=generateMockups({repoRoot:root,feature:fspec(),cols:argv.cols?Number(argv.cols):80,rows:argv.rows?Number(argv.rows):24,theme:argv.theme||'dark'});console.log('Generated '+r.state_count+' SVG/TXT state mockups and '+r.html);return;}
+  if(command==='mockup'){const r=generateMockups({repoRoot:root,feature:fspec(),cols:argv.cols!==undefined?Number(argv.cols):undefined,rows:argv.rows!==undefined?Number(argv.rows):undefined,viewport:argv.viewport,scenario:argv.scenario,outputs:argv.outputs,theme:argv.theme||'dark'});console.log('Generated '+r.variant_count+' mockup variants'+(r.html?' and '+r.html:''));return;}
   if(command==='visualize'){const o=renderViewer({repoRoot:root,feature:fspec(),output:argv.output||'contracts-viewer.html'});console.log('Generated '+o.path);return;}
   if(command==='build'||command==='watch'){
     const all=!!argv.all;

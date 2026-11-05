@@ -2,24 +2,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {featureDir} from './generate-html.mjs';
+import {validatePresentationConfig} from './mockup/validate-config.mjs';
 const read=(d,f)=>{const p=path.join(d,f);if(!fs.existsSync(p))return null;if(fs.lstatSync(p).isSymbolicLink())throw new Error('Symlinked visual file refused: '+p);return JSON.parse(fs.readFileSync(p,'utf8'));};
 function nodes(r){return [r,...(r.children||[]).flatMap(nodes)];}
 export function validateVisual(repoRoot,feature){
  const dir=featureDir(repoRoot,feature),errors=[],warnings=[];
  const screens=read(dir,'screens.json')?.screens||[],states=read(dir,'machine.json')?.states||[];
  const design=read(dir,'design.json'),scenarios=read(dir,'scenarios.json'),catalog=read(dir,'components.catalog.json');
- for(const [name,value,keys] of [['design',design,['schema_version','componentMappings','componentProps','themes']],['scenarios',scenarios,['schema_version','defaults','states']]]){
-  if(!value)continue;
-  if(value.schema_version!=='1.0.0')errors.push(`${name}.json: schema_version must be 1.0.0`);
-  for(const key of Object.keys(value))if(!keys.includes(key))errors.push(`${name}.json: unsupported property ${key}`);
- }
- const stateIds=new Set(states.map(s=>s.id)),allNodes=new Map(screens.map(s=>[s.id,new Set(s.regions.flatMap(nodes).map(n=>n.id))]));
- for(const [id,fixture]of Object.entries(scenarios?.states||{})){
-  if(!stateIds.has(id))errors.push('scenarios.json: unknown state '+id);
-  const screen=states.find(s=>s.id===id)?.screen;
-  for(const component of Object.keys(fixture.components||{}))if(!allNodes.get(screen)?.has(component))errors.push(`scenarios.json: unknown component ${component} in state ${id}`);
-  if(fixture.focus&&!allNodes.get(screen)?.has(fixture.focus))errors.push(`scenarios.json: unknown focus ${fixture.focus} in state ${id}`);
- }
+ errors.push(...validatePresentationConfig(design,scenarios,screens,states));
  for(const [kind,mapping]of Object.entries(design?.componentMappings||{})){
   if(!/^(ink|opentui)\/[a-z0-9][a-z0-9-]*$/.test(mapping))errors.push('design.json: invalid mapping '+mapping);
   else if(!catalog?.components?.some(c=>c.name===mapping))warnings.push(`design.json: ${kind} mapping ${mapping} has no imported schema`);

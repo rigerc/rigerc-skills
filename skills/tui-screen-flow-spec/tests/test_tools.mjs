@@ -49,7 +49,7 @@ test('portable skill root follows metadata and packaging conventions',()=>{
   assert.equal(path.basename(skillRoot),'tui-screen-flow-spec');
   const skill=fs.readFileSync(path.join(skillRoot,'SKILL.md'),'utf8');
   assert.match(skill,/^---\nname: tui-screen-flow-spec/m);
-  assert.match(skill,/version: "1\.3\.0"/);
+  assert.match(skill,/version: "1\.5\.0"/);
   assert.ok(fs.existsSync(path.join(skillRoot,'README.md')));
   assert.equal(fs.readdirSync(path.join(skillRoot,'.agents','prompts')).length,6);
 });

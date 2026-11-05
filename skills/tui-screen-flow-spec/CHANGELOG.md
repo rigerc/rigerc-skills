@@ -1,3 +1,12 @@
+## 1.5.0 — configurable mockup layouts, scenario matrices and output adapters
+
+- Added a terminal-cell layout engine for nested horizontal/vertical/grid/overlay containers, configurable spacing, padding, borders, widths, alignment, wrapping and clipping warnings. Existing designs without new layout/style overrides retain the v1.4 text renderer and unchanged default TXT bytes.
+- Introduced pluggable component renderers for semantic kinds and mapped termcn targets. Added checkbox, select, table and dialog previews; unknown kinds remain explicitly flagged.
+- Added named viewport profiles and sample scenario variants with per-state overrides, deterministic multi-variant file names and index entries, selectable export formats including ANSI true-color terminal output.
+- Storyboard now has optional viewport/scenario selectors, per-role theme colors, and safe DOM-based variant rendering.
+- New optional `design.json`/`scenarios.json` schema version 1.1.0 (1.0.0 remains supported), validation, CLI flags, example configurations and regression tests. Canonical contract/screen/machine schemas remain unchanged.
+- No runtime Ink/OpenTUI code is loaded or executed.
+
 ## 1.4.0 — termcn component schemas and TUI mockups
 
 - New `termcn-import` command ingests termcn's shadcn registry item JSON, extracts serializable TypeScript `Props` into JSON Schemas, records callbacks and unresolved declarations, and writes a hashed component catalog.

@@ -3,7 +3,7 @@ name: tui-screen-flow-spec
 description: Design or document framework-agnostic terminal user interfaces (TUIs). Generate source-backed UI, state, event, command, data, and validation contracts from existing applications, or plan new TUI screens with full state-machine flows. Present a provisional plan first, interview the user in iterative rounds, obtain plan approval before generating, then validate contracts and create a standalone interactive HTML contract explorer. Store design artifacts under docs/plans/generated/tui at the repository root. Use for TUI design, audits, reverse-engineering, contract extraction, and handoffs.
 compatibility: Agent Skills agent with filesystem access; Node.js 18+ to generate HTML and orchestrate workflows; Python 3.9+ to validate. No third-party dependencies.
 metadata:
-  version: "1.3.0"
+  version: "1.5.0"
   output-version: "1.0.0"
 ---
 
@@ -88,10 +88,10 @@ Produce *design specifications and implementation contracts*, **not application 
 - [Complete examples](examples/) for full-mode and contracts-only deliverables.
 
 
-## Optional termcn schemas and state mockups (1.4.0)
+## Optional termcn schemas and flexible state mockups (1.5.0)
 
 Full-mode features can import shadcn-compatible **termcn Ink/OpenTUI registry items** into `components.catalog.json` and conservative `components.schemas/*.schema.json`. Use `node scripts/tui.mjs termcn-import --repo-root <root> --feature <slug> --registry <local-registry-index-or-https://termcn.dev/r/registry.json> --components ink/text-input,...`. Remote imports are explicitly opt-in and never execute retrieved code. Unresolved inherited/nonserializable TypeScript types must be surfaced, not fabricated; callbacks are metadata rather than JSON values.
 
-`node scripts/tui.mjs build --repo-root <root> --feature <slug>` additionally generates `storyboard.html`, `mockups/index.json`, and a `.txt`/`.svg` per machine state when full screen/machine definitions exist. `node scripts/tui.mjs mockup ...` can run just the mockup step. Optional `design.json` maps semantic kinds to imported registry components and supplies theme tokens and per-node props. Optional `scenarios.json` supplies fixture values, overrides and focus for sample screens. Their schema files live under `assets/schemas/`.
+`node scripts/tui.mjs build --repo-root <root> --feature <slug>` additionally generates `storyboard.html`, `mockups/index.json`, and a `.txt`/`.svg` per machine state when full screen/machine definitions exist. `node scripts/tui.mjs mockup ...` can run just the mockup step. Optional `design.json` maps semantic kinds to imported registry components and supplies theme tokens and per-node props. Optional `scenarios.json` supplies fixture values, overrides and focus for sample screens. Version 1.1 of the optional visual configuration adds `design.preview` (named viewports, container layouts, widget styles, export formats) and named `scenarios.variants`/`stateVariants`; canonical screens, machine, and contracts remain at schema 1.0. See `assets/templates/*flex.example.json`. Their schema files live under `assets/schemas/`.
 
 **Important:** generated previews are deterministic semantic illustrations, not faithful running termcn components. They may not match real application execution. Do not infer events, modify guards, or execute application code while generating them. A new user-requested interaction requires canonical spec review and approval. Prefer a pinned upstream registry mirror for production schema generation. Reference `README.md` for complete command examples.

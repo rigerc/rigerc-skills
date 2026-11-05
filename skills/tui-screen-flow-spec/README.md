@@ -42,7 +42,7 @@ tui-screen-flow-spec/
 
 ## termcn-backed component schemas and automatic mockups
 
-**New in 1.4.0.** Full-mode features can generate termcn-derived JSON Schemas and an interactive **screen-flow storyboard**, with per-state SVG and plain-text terminal mockups. The importer handles shadcn registry items for the Ink and OpenTUI targets. **These are semantic mockups, not screenshots of live termcn components**; actual framework output may differ.
+**Added in 1.4.0; flexible previews in 1.5.0.** Full-mode features can generate termcn-derived JSON Schemas and an interactive **screen-flow storyboard**, with per-state SVG and plain-text terminal mockups. The importer handles shadcn registry items for the Ink and OpenTUI targets. **These are semantic mockups, not screenshots of live termcn components**; actual framework output may differ.
 
 Quick start (run from the skill directory):
 
@@ -79,8 +79,8 @@ You can also supply a local mirror of `r/registry.json` plus corresponding `r/in
 - `scenarios.json` (optional): per-state fixture values, status text, focus, component overrides, and empty/error/disabled states.
 - `components.catalog.json`: generated registry metadata, component capabilities, dependency lists, source hashes, and schema paths.
 - `components.schemas/*.schema.json`: conservative JSON Schemas derived from exported TypeScript `*Props` interfaces.
-- `storyboard.html`: offline interactive screen/state gallery, transition navigation, theme switching, and metadata inspector.
-- `mockups/*.svg`, `mockups/*.txt`, `mockups/index.json`: one vector and text preview per state and an index.
+- `storyboard.html`: offline interactive screen/state gallery, transition navigation, theme and (when configured) viewport/scenario switching, side-by-side state comparison, and metadata inspector.
+- `mockups/*.svg`, `mockups/*.txt`, optionally `mockups/*.ansi`, `mockups/index.json`: previews for all selected viewport/scenario combinations and a machine-readable index.
 
 The importer **does not claim complete TypeScript-to-JSON-Schema coverage**. Simple serializable scalar props, literal unions, arrays, and inline objects are converted. Callbacks are recorded as event metadata, not executable JSON. Complex or inherited types are reported in `x-termcn.unresolved_props`, rather than silently converted to unrestricted properties. Use `--strict` during import to reject unresolved declarations. The generated component schema validates `design.json.componentProps` through the CLI's visual validator.
 
@@ -90,6 +90,50 @@ Running `build` or `watch` produces the storyboard automatically for features wi
 node scripts/tui.mjs mockup --repo-root /path/to/repository \
   --feature example-task-tracker --cols 80 --rows 24 --theme ocean
 ```
+
+### Configurable previews (1.5.0)
+
+Canonical `screens.json`, `machine.json`, and `contracts.json` stay at `schema_version: "1.0.0"`. Optional `design.json` and `scenarios.json` may remain **1.0.0** for exact legacy rendering or use **1.1.0** for additional presentation options. No runtime component code is executed. Upgrading without `design.preview.layouts` or `design.preview.styles` keeps the legacy line renderer; adding a layout/style config enables the cell-grid layout engine.
+
+A minimal `design.json` 1.1 preview configuration (copy the full working example from `assets/templates/design.flex.example.json` and tailor the node IDs):
+
+```json
+{
+  "schema_version": "1.1.0",
+  "preview": {
+    "viewports": {
+      "compact": {"cols": 60, "rows": 20},
+      "wide": {"cols": 120, "rows": 32}
+    },
+    "layouts": {
+      "task-create/root": {"direction": "horizontal", "gap": 2, "border": "rounded"}
+    },
+    "styles": {
+      "task-create/title-input": {"width": "100%", "wrap": true, "border": "single"}
+    },
+    "outputs": ["txt", "svg", "ansi", "html"]
+  }
+}
+```
+
+`preview.layouts` targets **container nodes** using `<screen-id>/<node-id>` keys. Its `direction` supports `horizontal`, `vertical`, `grid` (`columns`), and `overlay`, as well as `gap`, `padding`, `width` (integer cells or percentage), `border` (`none`, `single`, `rounded`, `double`), `align`, and `valign`. `preview.styles` supports per-node dimensions, padding, borders, alignment, semantic color `role`, `wrap`, `maxHeight`, and widget-specific `maxItems` or table `columns`. Semantic colors are preserved in SVG, ANSI, and HTML. Use `byViewport` within a layout/style to override properties for a named viewport (for example, `"byViewport": {"compact": {"direction": "vertical"}}`). Container arrangements do **not** change canonical screen semantics.
+
+For scenario matrices, `scenarios.json` 1.1 adds `variants` (named global fixture overrides) and `stateVariants` (overrides for one state in one variant). Merging order is defaults → state fixture → variant fixture → state-variant fixture. Each layer may specify `data`, `state`, `components`, `focus`, or explicit `presentation.statusType` and `presentation.statusText`. Example: `assets/templates/scenarios.flex.example.json`. The baseline variant is always named `default`.
+
+```bash
+# Render every configured viewport and scenario
+node scripts/tui.mjs mockup --repo-root /path/to/repository \
+  --feature example-task-tracker
+
+# Restrict to one profile/scenario and only selected formats
+node scripts/tui.mjs mockup --repo-root /path/to/repository \
+  --feature example-task-tracker --viewport compact --scenario empty \
+  --outputs txt,svg --theme ocean
+```
+
+Use `--viewport compact,wide` and `--scenario default,empty` for comma-separated selections. Explicit `--cols`/`--rows` override named viewports and create one `default` profile. If multiple variants are emitted, filenames include `.viewport.scenario` to prevent collisions; single-variant runs retain the original `<state>.txt`/`.svg` naming. `--outputs` may include `txt`, `svg`, `ansi`, and `html`; `mockups/index.json` is always produced. When `html` is selected the storyboard uses safe DOM text insertion for variant switching.
+
+Custom semantic components can be rendered by importing `registerMockupRenderer` from `scripts/mockup.mjs` and registering a `(node, context) => [{ text, role }]` adapter for the component kind, or for an `ink/...` / `opentui/...` target named in `componentMappings`. The function returns an unregister callback. Built-in adapters include text, list, input, button, status, checkbox, select, table, and dialog. Unknown kinds still produce an explicit unsupported preview rather than silently inventing behavior.
 
 The preview generator never executes the app or component library. It warns about previews below the canonical screen minimum and clips overflowing text. The storyboard includes every declared state and transition; fixture-generated values are visibly labeled as sample data. Contracts-only features intentionally do not produce fake screens or state graphs.
 
