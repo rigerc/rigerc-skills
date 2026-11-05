@@ -17,6 +17,8 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm run check
+      - name: Test VHS CI installer
+        run: python3 -m unittest discover -s skills/vhs-ci/tests -v
       - name: Compile deterministic publication candidate
         env:
           SOURCE_SHA: ${{ github.sha }}
